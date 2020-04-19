@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "241559004143",
+    "firebase_url": "https://hiichat-82594.firebaseio.com",
+    "project_id": "hiichat-82594",
+    "storage_bucket": "hiichat-82594.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:241559004143:android:65ee84b4cd61e385434c1a",
+        "android_client_info": {
+          "package_name": "com.example.hiichat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "241559004143-9uq4dcn4eh7bubv3jbn10r8pv91p0f66.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.hiichat",
+            "certificate_hash": "4f569dccf1377de1472251ad2f4269363e54ec77"
+          }
+        },
+        {
+          "client_id": "241559004143-2c1ll9lnmimpo20qglco7l8ur5e9i0pj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzLLeSd45kKer6Ubw3UWiE9z2hi4-rtsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "241559004143-2c1ll9lnmimpo20qglco7l8ur5e9i0pj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
