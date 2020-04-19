@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">HiiChat</string>
+    <string name="login">LOGIN</string>
+    <string name="Email">Email</string>
+    <string name="Pass">Password</string>
+    <string name="go">Go</string>
+    <string name="forgot_your_password">Forgot yout password ?</string>
+    <string name="register">REGISTER</string>
+    <string name="repeat_password">Repeat Password</string>
 </resources>

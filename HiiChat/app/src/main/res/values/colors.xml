@@ -3,4 +3,11 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="colorView">#2fa881</color>
+    <color name="colorLogin">#2fa881</color>
+    <color name="colortextLogin">#FFCC00</color>
+    <color name="colortextHint">#c5c5c5</color>
+    <color name="colortextEmail">#2fa881</color>
+    <color name="colorForgotPass">#9a9a9a</color>
+
 </resources>
