@@ -7,4 +7,8 @@
     <string name="forgot_your_password">Forgot yout password ?</string>
     <string name="register">REGISTER</string>
     <string name="repeat_password">Repeat Password</string>
+    <string name="invalid_email_pass">Invalid email or not match password</string>
+    <string name="invalid_email_or_pass">Invalid email or empty password"</string>
+    <string name="login_false">Login False</string>
+    <string name="invalid_email">Invalid email</string>
 </resources>
