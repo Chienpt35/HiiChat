@@ -9,5 +9,5 @@
     <color name="colortextHint">#c5c5c5</color>
     <color name="colortextEmail">#2fa881</color>
     <color name="colorForgotPass">#9a9a9a</color>
-
+    <color name="colorIndivateTab">#FFFFFF</color>
 </resources>
