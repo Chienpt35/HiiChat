@@ -1,59 +1,57 @@
 package com.example.hiichat.Fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.example.hiichat.Adapter.UserInfoAdapter;
+import com.example.hiichat.Model.Configuration;
+import com.example.hiichat.Model.User;
 import com.example.hiichat.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.yarolegovich.lovelydialog.LovelyProgressDialog;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link UserProfileFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class UserProfileFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    TextView tvUserName;
+    ImageView avatar;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private List<Configuration> listConfig = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private UserInfoAdapter infoAdapter;
+
+    private static final String USERNAME_LABEL = "Username";
+    private static final String EMAIL_LABEL = "Email";
+    private static final String SIGNOUT_LABEL = "Sign out";
+    private static final String RESETPASS_LABEL = "Change Password";
+
+    private static final int PICK_IMAGE = 1994;
+    private LovelyProgressDialog waitingDialog;
+
+    private DatabaseReference userDB;
+    private FirebaseAuth mAuth;
+    private User myAccount;
+    private Context context;
 
     public UserProfileFragment() {
-        // Required empty public constructor
-    }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment UserProfileFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static UserProfileFragment newInstance(String param1, String param2) {
-        UserProfileFragment fragment = new UserProfileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
