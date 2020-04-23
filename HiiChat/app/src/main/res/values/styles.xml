@@ -19,12 +19,22 @@
         <item name="android:windowBackground">@drawable/bg</item>
     </style>
 
+    <style name="EditTextTintTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorPrimaryDark">#0288D1</item>
+    </style>
+
     <style name="TranslucentBackground" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="windowNoTitle">true</item>
         <item name="colorPrimary">@color/colorView</item>
         <item name="colorPrimaryDark">#000</item>
-        <item name="colorAccent">#4fa881</item>
+        <item name="colorAccent">@color/colorView</item>
         <item name="android:windowBackground">@drawable/bg_sao</item>
+    </style>
+
+    <style name="MyThemeNoActionbar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
     <style name="TextLabel" parent="Theme.AppCompat.Light.NoActionBar">
@@ -36,7 +46,7 @@
         <item name="windowNoTitle">true</item>
         <item name="colorPrimary">#03DAC5</item>
         <item name="colorPrimaryDark">#000</item>
-        <item name="colorAccent">#4fa881</item>
+        <item name="colorAccent">@color/colorView</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>

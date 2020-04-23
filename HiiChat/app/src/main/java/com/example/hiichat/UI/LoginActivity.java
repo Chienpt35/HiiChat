@@ -158,7 +158,7 @@ public class LoginActivity extends AppCompatActivity {
         void creatUser(String email, String pass) {
             waitingDialog.setIcon(R.drawable.ic_add_friend)
                     .setTitle("Registering....")
-                    .setTopColorRes(R.color.colorPrimary)
+                    .setTopColorRes(R.color.colorView)
                     .show();
             mAuth.createUserWithEmailAndPassword(email, pass)
                     .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
@@ -183,7 +183,7 @@ public class LoginActivity extends AppCompatActivity {
                                         return super.setConfirmButtonText(text);
                                     }
                                 }
-                                        .setTopColorRes(R.color.colorAccent)
+                                        .setTopColorRes(R.color.colorView)
                                         .setIcon(R.drawable.ic_add_friend)
                                         .setTitle("Register false")
                                         .setMessage("Email exist or weak password!")
@@ -209,7 +209,7 @@ public class LoginActivity extends AppCompatActivity {
         void signIn(String email, String pass) {
             waitingDialog.setIcon(R.drawable.ic_person_low)
                     .setTitle("Login....")
-                    .setTopColorRes(R.color.colorPrimary)
+                    .setTopColorRes(R.color.colorView)
                     .show();
             mAuth.signInWithEmailAndPassword(email, pass)
                     .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
@@ -234,7 +234,7 @@ public class LoginActivity extends AppCompatActivity {
                                         return super.setConfirmButtonText(text);
                                     }
                                 }
-                                        .setTopColorRes(R.color.colorAccent)
+                                        .setTopColorRes(R.color.colorView)
                                         .setIcon(R.drawable.ic_person_low)
                                         .setTitle(R.string.login_false)
                                         .setMessage("Email not exist or wrong password!")
@@ -274,7 +274,7 @@ public class LoginActivity extends AppCompatActivity {
                                     return super.setConfirmButtonText(text);
                                 }
                             }
-                                    .setTopColorRes(R.color.colorPrimary)
+                                    .setTopColorRes(R.color.colorView)
                                     .setIcon(R.drawable.ic_pass_reset)
                                     .setTitle("Password Recovery")
                                     .setMessage("Sent email to " + email)
@@ -297,7 +297,7 @@ public class LoginActivity extends AppCompatActivity {
                                     return super.setConfirmButtonText(text);
                                 }
                             }
-                                    .setTopColorRes(R.color.colorAccent)
+                                    .setTopColorRes(R.color.colorView)
                                     .setIcon(R.drawable.ic_pass_reset)
                                     .setTitle("False")
                                     .setMessage("False to sent email to " + email)
