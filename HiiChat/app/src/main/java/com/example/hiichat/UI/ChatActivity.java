@@ -6,14 +6,18 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -46,6 +50,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayoutManager linearLayoutManager;
     public static HashMap<String, Bitmap> bitmapAvataFriend;
     public Bitmap bitmapAvataUser;
+    private LinearLayout linearLayout, linearLayout1, linearLayout2;
+    private RelativeLayout r, r1;
 
 
     @Override
@@ -56,6 +62,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         idFriend = intentData.getCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID);
         roomId = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID);
         String nameFriend = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
 
         consersation = new Consersation();
         btnSend = (ImageButton) findViewById(R.id.btnSend);
@@ -70,8 +79,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         editWriteMessage = (EditText) findViewById(R.id.editWriteMessage);
-        if (idFriend != null && nameFriend != null) {
-            getSupportActionBar().setTitle(nameFriend);
+        if (idFriend != null && nameFriend != null && toolbar != null) {
+           toolbar.setTitle(nameFriend);
             linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
             recyclerChat = (RecyclerView) findViewById(R.id.recyclerChat);
             recyclerChat.setLayoutManager(linearLayoutManager);
@@ -114,6 +123,46 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             });
             recyclerChat.setAdapter(adapter);
         }
+
+        linearLayout = findViewById(R.id.linearlayout);
+        linearLayout1 = findViewById(R.id.linearlayout1);
+        linearLayout2 = findViewById(R.id.linearlayout2);
+
+        r = findViewById(R.id.r);
+        r1 = findViewById(R.id.r1);
+
+        editWriteMessage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus){
+                    editWriteMessage.setHint("Nhập tin nhắn...");
+                    editWriteMessage.getLayoutParams().width = 500;
+                    linearLayout1.setVisibility(View.GONE);
+                    linearLayout2.setVisibility(View.VISIBLE);
+                    r.requestLayout();
+                }
+            }
+        });
+        editWriteMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editWriteMessage.setHint("Nhập tin nhắn...");
+                editWriteMessage.getLayoutParams().width = 500;
+                linearLayout1.setVisibility(View.GONE);
+                linearLayout2.setVisibility(View.VISIBLE);
+                r1.requestLayout();
+            }
+        });
+        linearLayout2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editWriteMessage.setHint("Aa");
+                editWriteMessage.getLayoutParams().width = 300;
+                linearLayout1.setVisibility(View.VISIBLE);
+                linearLayout2.setVisibility(View.GONE);
+                r1.requestLayout();
+            }
+        });
     }
 
     @Override

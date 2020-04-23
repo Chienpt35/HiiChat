@@ -93,7 +93,7 @@ public class AddGroupActivity extends AppCompatActivity {
         btnAddGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (listIDChoose.size() <= 2) {
+                if (listIDChoose.size() <= 1) {
                     Toast.makeText(AddGroupActivity.this, "Add at lease one people to create group", Toast.LENGTH_SHORT).show();
                 } else {
                     if (editTextGroupName.getText().length() == 0) {

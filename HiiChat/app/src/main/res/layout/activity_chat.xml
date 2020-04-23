@@ -1,53 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/colorIndivateTab">
+    android:background="@color/colorIndivateTab"
+    android:orientation="vertical">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorView"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:layout_alignParentStart="true"/>
 
-    <ImageButton
-        android:id="@+id/btnSend"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:background="#00000000"
-        android:padding="10dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_send" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_below="@+id/toolbar"
+        android:id="@+id/recyclerChat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/line"/>
 
     <View
         android:id="@+id/line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/grey_200"
-        android:layout_above="@id/btnSend"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerChat"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/line">
-
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <EditText
-        android:id="@+id/editWriteMessage"
-        android:layout_width="match_parent"
+        android:layout_above="@id/btnSend"
+        android:background="@color/grey_200" />
+    <ImageButton
+        android:id="@+id/btnSend"
+        android:layout_width="45dp"
         android:layout_height="45dp"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_toStartOf="@id/btnSend"
-        android:background="@drawable/botron_edittext"
-        android:drawablePadding="20dp"
-        android:inputType="textLongMessage"
-        android:maxLines="1"
-        android:paddingLeft="7dp"
-        android:paddingRight="7dp"
-        android:hint="Aa"
-        android:textSize="15sp" />
+        android:background="#00000000"
+        android:padding="10dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/send" />
+
+    <RelativeLayout
+        android:id="@+id/r"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/btnSend"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/linearlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true">
+            <RelativeLayout
+                android:id="@+id/r1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp">
+                <EditText
+                    android:id="@+id/editWriteMessage"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/botron_edittext"
+                    android:drawablePadding="20dp"
+                    android:hint="Aa"
+                    android:inputType="textLongMessage"
+                    android:maxLines="1"
+                    android:paddingLeft="7dp"
+                    android:paddingRight="7dp"
+                    android:textSize="15sp"/>
+                <ImageView
+                    android:id="@+id/imgSmile"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/smile"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/editWriteMessage"
+                    android:layout_marginLeft="-30dp"/>
+            </RelativeLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/linearlayout1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_centerVertical="true"
+            android:padding="8dp"
+            android:layout_toStartOf="@id/linearlayout">
+            <ImageView
+                android:id="@+id/imgCamera"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/camera"
+                android:fitsSystemWindows="true"
+                android:layout_marginRight="20dp"/>
+            <ImageView
+                android:id="@+id/imgImage"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/image"
+                android:fitsSystemWindows="true"
+                android:layout_marginRight="20dp"/>
+            <ImageView
+                android:id="@+id/imgMicro"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/micro"
+                android:fitsSystemWindows="true"
+                android:layout_marginRight="15dp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/linearlayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:visibility="gone">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/arrow"
+                android:fitsSystemWindows="true"/>
+        </LinearLayout>
+    </RelativeLayout>
+
 
 </RelativeLayout>

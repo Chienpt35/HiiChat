@@ -102,7 +102,7 @@ public class GroupFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     }
 
     private void getListGroup(){
-        FirebaseDatabase.getInstance().getReference().child("User/"+ StaticConfig.UID+"/group").addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference().child("user/"+ StaticConfig.UID+"/group").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue() != null) {
@@ -251,7 +251,7 @@ public class GroupFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                     })
                     ;
         }else{
-            FirebaseDatabase.getInstance().getReference().child("User/"+group.member.get(index)+"/group/"+group.id).removeValue()
+            FirebaseDatabase.getInstance().getReference().child("user/"+group.member.get(index)+"/group/"+group.id).removeValue()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -301,7 +301,7 @@ public class GroupFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                 }
                             }
 
-                            FirebaseDatabase.getInstance().getReference().child("user").child(StaticConfig.UID)
+                            FirebaseDatabase.getInstance().getReference().child("User").child(StaticConfig.UID)
                                     .child("group").child(group.id).removeValue();
                             FirebaseDatabase.getInstance().getReference().child("group/"+group.id+"/member")
                                     .child(memberIndex).removeValue()

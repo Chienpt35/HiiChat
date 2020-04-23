@@ -33,6 +33,7 @@ import com.example.hiichat.Model.Friend;
 import com.example.hiichat.Model.ListFriend;
 import com.example.hiichat.R;
 import com.example.hiichat.Service.ServiceUtils;
+import com.example.hiichat.UI.ChatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -232,7 +233,7 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     .setTitle("Finding friend....")
                     .setTopColorRes(R.color.colorView)
                     .show();
-            FirebaseDatabase.getInstance().getReference().child("User").orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference().child("user").orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     dialogWait.dismiss();
@@ -404,7 +405,7 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             detectFriendOnline.start();
         } else {
             final String id = listFriendID.get(index);
-            FirebaseDatabase.getInstance().getReference().child("User/" + id).addListenerForSingleValueEvent(new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference().child("user/" + id).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.getValue() != null) {
@@ -467,29 +468,28 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         final String idRoom = listFriend.getListFriend().get(position).idRoom;
         final String avata = listFriend.getListFriend().get(position).avata;
         ((ItemFriendViewHolder) holder).txtName.setText(name);
-
         ((View) ((ItemFriendViewHolder) holder).txtName.getParent().getParent().getParent())
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
                         ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
-//                        Intent intent = new Intent(context, ChatActivity.class);
-//                        intent.putExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND, name);
-//                        ArrayList<CharSequence> idFriend = new ArrayList<CharSequence>();
-//                        idFriend.add(id);
-//                        intent.putCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID, idFriend);
-//                        intent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, idRoom);
-//                        ChatActivity.bitmapAvataFriend = new HashMap<>();
-//                        if (!avata.equals(StaticConfig.STR_DEFAULT_BASE64)) {
-//                            byte[] decodedString = Base64.decode(avata, Base64.DEFAULT);
-//                            ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
-//                        } else {
-//                            ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
-//                        }
+                        Intent intent = new Intent(context, ChatActivity.class);
+                        intent.putExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND, name);
+                        ArrayList<CharSequence> idFriend = new ArrayList<CharSequence>();
+                        idFriend.add(id);
+                        intent.putCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID, idFriend);
+                        intent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, idRoom);
+                        ChatActivity.bitmapAvataFriend = new HashMap<>();
+                        if (!avata.equals(StaticConfig.STR_DEFAULT_BASE64)) {
+                            byte[] decodedString = Base64.decode(avata, Base64.DEFAULT);
+                            ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+                        } else {
+                            ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
+                        }
 
                         mapMark.put(id, null);
-                        //fragment.startActivityForResult(intent, FriendsFragment.ACTION_START_CHAT);
+                        fragment.startActivityForResult(intent, FriendsFragment.ACTION_START_CHAT);
                     }
                 });
 

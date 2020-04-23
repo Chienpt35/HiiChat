@@ -308,7 +308,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         void saveUserInfo() {
-            FirebaseDatabase.getInstance().getReference().child("Users/" + StaticConfig.UID)
+            FirebaseDatabase.getInstance().getReference().child("user/" + StaticConfig.UID)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -333,7 +333,7 @@ public class LoginActivity extends AppCompatActivity {
             newUser.email = user.getEmail();
             newUser.name = user.getEmail().substring(0, user.getEmail().indexOf("@"));
             newUser.avata = StaticConfig.STR_DEFAULT_BASE64;
-            FirebaseDatabase.getInstance().getReference().child("User/" + user.getUid()).setValue(newUser);
+            FirebaseDatabase.getInstance().getReference().child("user/" + user.getUid()).setValue(newUser);
         }
     }
 }
