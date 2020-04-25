@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout1"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginTop="5dp"
     android:layout_marginBottom="5dp">
@@ -30,4 +31,14 @@
         android:text="a"
         android:textColor="#000" />
 
+    <ImageView
+        android:id="@+id/imgImageUser"
+        android:layout_width="100sp"
+        android:layout_height="100sp"
+        android:layout_toStartOf="@+id/imageView2"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:layout_marginEnd="5dp"
+        android:visibility="gone"
+        android:fitsSystemWindows="true"/>
 </RelativeLayout>
