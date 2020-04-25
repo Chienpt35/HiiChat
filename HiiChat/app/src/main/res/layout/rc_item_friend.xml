@@ -1,33 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="70dp"
-    android:layout_marginStart="15dp"
+    android:layout_marginStart="10dp"
     android:layout_marginTop="5dp"
-    android:layout_marginEnd="15dp"
-    android:layout_marginBottom="5dp"
-    card_view:cardBackgroundColor="@color/colorCardView"
-    card_view:cardCornerRadius="5dp">
-
+    android:layout_marginEnd="10dp"
+    android:layout_marginBottom="5dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="horizontal">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5">
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/icon_avata"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:src="@drawable/default_avata"/>
+            <ImageView
+                android:id="@+id/imgOnline"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/online"
+                android:layout_toRightOf="@+id/icon_avata"
+                android:layout_marginTop="40dp"
+                android:layout_marginLeft="-19dp"
+                android:visibility="visible"/>
+        </RelativeLayout>
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/icon_avata"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="10dp"
-            android:layout_weight="1"
-            card_view:civ_border_color="@color/colorView" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
             android:layout_weight="5"
             android:orientation="vertical">
 
@@ -45,6 +55,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="4"
                     android:gravity="center_vertical"
+                    android:textColor="@color/grey_800"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
@@ -69,4 +80,4 @@
                 android:textAppearance="?android:attr/textAppearanceSmall" />
         </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</LinearLayout>

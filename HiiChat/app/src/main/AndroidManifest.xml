@@ -49,7 +49,7 @@
         <activity
             android:name=".UI.ChatActivity"
             android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

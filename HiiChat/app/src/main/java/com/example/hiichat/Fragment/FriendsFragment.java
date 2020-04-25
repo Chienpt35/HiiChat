@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -647,9 +648,9 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         if (listFriend.getListFriend().get(position).status.isOnline) {
-            ((ItemFriendViewHolder) holder).avata.setBorderWidth(10);
+            ((ItemFriendViewHolder) holder).imgOnline.setVisibility(View.VISIBLE);
         } else {
-            ((ItemFriendViewHolder) holder).avata.setBorderWidth(0);
+            ((ItemFriendViewHolder) holder).imgOnline.setVisibility(View.GONE);
         }
     }
 
@@ -732,6 +733,7 @@ class ItemFriendViewHolder extends RecyclerView.ViewHolder {
     public CircleImageView avata;
     public TextView txtName, txtTime, txtMessage;
     private Context context;
+    public ImageView imgOnline;
 
     ItemFriendViewHolder(Context context, View itemView) {
         super(itemView);
@@ -739,6 +741,7 @@ class ItemFriendViewHolder extends RecyclerView.ViewHolder {
         txtName = (TextView) itemView.findViewById(R.id.txtName);
         txtTime = (TextView) itemView.findViewById(R.id.txtTime);
         txtMessage = (TextView) itemView.findViewById(R.id.txtMessage);
+        imgOnline = (ImageView) itemView.findViewById(R.id.imgOnline);
         this.context = context;
     }
 }

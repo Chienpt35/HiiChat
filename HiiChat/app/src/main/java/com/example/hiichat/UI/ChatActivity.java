@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -65,6 +66,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         Toolbar toolbar = findViewById(R.id.toolbar);
 
+       findViewById(R.id.imgBack).setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               finish();
+           }
+       });
 
         consersation = new Consersation();
         btnSend = (ImageButton) findViewById(R.id.btnSend);
@@ -80,7 +87,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         editWriteMessage = (EditText) findViewById(R.id.editWriteMessage);
         if (idFriend != null && nameFriend != null && toolbar != null) {
-           toolbar.setTitle(nameFriend);
+            toolbar.setTitleMarginStart(130);
+            toolbar.setTitle(nameFriend);
+            toolbar.setTitleTextColor(getResources().getColor(R.color.grey_800));
             linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
             recyclerChat = (RecyclerView) findViewById(R.id.recyclerChat);
             recyclerChat.setLayoutManager(linearLayoutManager);
