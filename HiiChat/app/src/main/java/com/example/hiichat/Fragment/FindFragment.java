@@ -12,10 +12,10 @@ import com.example.hiichat.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link MusicFragment#newInstance} factory method to
+ * Use the {@link FindFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MusicFragment extends Fragment {
+public class FindFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -25,7 +25,7 @@ public class MusicFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public MusicFragment() {
+    public FindFragment() {
         // Required empty public constructor
     }
 
@@ -38,8 +38,8 @@ public class MusicFragment extends Fragment {
      * @return A new instance of fragment MusicFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MusicFragment newInstance(String param1, String param2) {
-        MusicFragment fragment = new MusicFragment();
+    public static FindFragment newInstance(String param1, String param2) {
+        FindFragment fragment = new FindFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);

@@ -22,7 +22,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorView"
+                android:background="@color/grey_800"
                 android:minHeight="?attr/actionBarSize"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 android:layout_alignParentStart="true"/>
@@ -32,7 +32,16 @@
                 android:layout_height="30dp"
                 android:src="@drawable/iconfinder_arrow_left"
                 android:layout_centerVertical="true"
-                android:layout_margin="10dp"/>
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"/>
+            <ImageView
+                android:id="@+id/imgVideoCall"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_video_call"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="20dp"/>
         </RelativeLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -49,7 +58,8 @@
             android:id="@+id/imgResultCamera"
             android:layout_width="80sp"
             android:layout_height="100sp"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"/>
     </FrameLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:layout_below="@+id/appBar"
@@ -75,89 +85,77 @@
         android:scaleType="centerInside"
         android:src="@drawable/send" />
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/r3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@+id/btnSend"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:id="@+id/linearlayout"
-            android:layout_width="wrap_content"
+        android:orientation="horizontal"
+        android:layout_toRightOf="@+id/linearlayout2"
+        android:gravity="center_vertical">
+        <ImageView
+            android:id="@+id/imgCamera"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/camera"
+            android:fitsSystemWindows="true"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"/>
+        <ImageView
+            android:id="@+id/imgImage"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/image"
+            android:fitsSystemWindows="true"
+            android:layout_marginRight="15dp" />
+        <ImageView
+            android:id="@+id/imgMicro"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/micro"
+            android:fitsSystemWindows="true"
+            android:layout_marginRight="15dp" />
+        <RelativeLayout
+            android:id="@+id/r1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true">
-            <RelativeLayout
-                android:id="@+id/r1"
-                android:layout_width="wrap_content"
+            android:layout_margin="8dp">
+            <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
+                android:id="@+id/editWriteMessage"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp">
-                <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
-                    android:id="@+id/editWriteMessage"
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/botron_edittext"
-                    android:drawablePadding="20dp"
-                    android:hint="Aa"
-                    android:inputType="textLongMessage"
-                    android:maxLines="1"
-                    android:paddingLeft="7dp"
-                    android:paddingRight="7dp"
-                    android:textSize="15sp"/>
-                <ImageView
-                    android:id="@+id/imgSmile"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/smile"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/editWriteMessage"
-                    android:layout_marginLeft="-30dp"/>
-            </RelativeLayout>
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/linearlayout1"
+                android:background="@drawable/botron_edittext"
+                android:drawablePadding="20dp"
+                android:hint="Aa"
+                android:inputType="textLongMessage"
+                android:maxLines="1"
+                android:paddingLeft="7dp"
+                android:paddingRight="7dp"
+                android:textSize="15sp"/>
+            <ImageView
+                android:id="@+id/imgSmile"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/smile"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/editWriteMessage"
+                android:layout_marginLeft="-30dp"/>
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearlayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"
+        android:layout_marginBottom="6dp">
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_centerVertical="true"
-            android:padding="8dp"
-            android:layout_toStartOf="@id/linearlayout">
-            <ImageView
-                android:id="@+id/imgCamera"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/camera"
-                android:fitsSystemWindows="true"
-                android:layout_marginRight="20dp"/>
-            <ImageView
-                android:id="@+id/imgImage"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/image"
-                android:fitsSystemWindows="true"
-                android:layout_marginRight="20dp" />
-            <ImageView
-                android:id="@+id/imgMicro"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/micro"
-                android:fitsSystemWindows="true"
-                android:layout_marginRight="15dp" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/linearlayout2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:visibility="gone">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/arrow"
-                android:fitsSystemWindows="true" />
-        </LinearLayout>
-    </RelativeLayout>
-
-
+            android:src="@drawable/arrow"
+            android:fitsSystemWindows="true" />
+    </LinearLayout>
 </RelativeLayout>

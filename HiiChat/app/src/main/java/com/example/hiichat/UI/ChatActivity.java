@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -13,6 +14,7 @@ import android.text.InputType;
 import android.text.format.DateFormat;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -28,13 +30,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.hiichat.BuildConfig;
 import com.example.hiichat.Data.SharedPreferenceHelper;
 import com.example.hiichat.Data.StaticConfig;
 import com.example.hiichat.Model.Consersation;
@@ -78,7 +80,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayoutManager linearLayoutManager;
     public static HashMap<String, Bitmap> bitmapAvataFriend;
     public Bitmap bitmapAvataUser;
-    private LinearLayout linearLayout, linearLayout1, linearLayout2;
+    private LinearLayout linearLayout2, r3;
     private RelativeLayout r1;
     private View rootView;
     private ImageView imgCamera, imgImage, imgMicro, imgSmile, imgResultCamera;
@@ -127,7 +129,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (idFriend != null && nameFriend != null && toolbar != null) {
             toolbar.setTitleMarginStart(130);
             toolbar.setTitle(nameFriend);
-            toolbar.setTitleTextColor(getResources().getColor(R.color.grey_800));
+            toolbar.setTitleTextColor(getResources().getColor(R.color.colorIndivateTab));
             linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
             recyclerChat = (RecyclerView) findViewById(R.id.recyclerChat);
             recyclerChat.setLayoutManager(linearLayoutManager);
@@ -174,14 +176,26 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void animatorEditText() {
+        final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+
+
+        final LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+
+
         editWriteMessage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     editWriteMessage.setHint("Nhập tin nhắn...");
-                    editWriteMessage.getLayoutParams().width = 500;
-                    linearLayout1.setVisibility(View.GONE);
+                    imgCamera.setVisibility(View.GONE);
+                    imgImage.setVisibility(View.GONE);
+                    imgMicro.setVisibility(View.GONE);
                     linearLayout2.setVisibility(View.VISIBLE);
+                    r1.setGravity(RelativeLayout.CENTER_VERTICAL);
+                    r1.setLayoutParams(params);
                     r1.requestLayout();
                 }
             }
@@ -190,19 +204,26 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 editWriteMessage.setHint("Nhập tin nhắn...");
-                editWriteMessage.getLayoutParams().width = 500;
-                linearLayout1.setVisibility(View.GONE);
+                imgCamera.setVisibility(View.GONE);
+                imgImage.setVisibility(View.GONE);
+                imgMicro.setVisibility(View.GONE);
                 linearLayout2.setVisibility(View.VISIBLE);
+                r1.setGravity(RelativeLayout.CENTER_VERTICAL);
+                r1.setLayoutParams(params);
                 r1.requestLayout();
             }
         });
         linearLayout2.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
                 editWriteMessage.setHint("Aa");
-                editWriteMessage.getLayoutParams().width = 300;
-                linearLayout1.setVisibility(View.VISIBLE);
+                imgCamera.setVisibility(View.VISIBLE);
+                imgImage.setVisibility(View.VISIBLE);
+                imgMicro.setVisibility(View.VISIBLE);
                 linearLayout2.setVisibility(View.GONE);
+                r1.setGravity(RelativeLayout.CENTER_VERTICAL);
+                r1.setLayoutParams(params1);
                 r1.requestLayout();
             }
         });
@@ -210,10 +231,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private void init() {
         progressDialog = new ProgressDialog(this);
-        linearLayout = findViewById(R.id.linearlayout);
-        linearLayout1 = findViewById(R.id.linearlayout1);
         linearLayout2 = findViewById(R.id.linearlayout2);
         r1 = findViewById(R.id.r1);
+        r3 = findViewById(R.id.r3);
         consersation = new Consersation();
         btnSend = (ImageButton) findViewById(R.id.btnSend);
         btnSend.setOnClickListener(this);

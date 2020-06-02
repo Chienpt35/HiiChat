@@ -2,38 +2,29 @@ package com.example.hiichat;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.example.hiichat.Adapter.ViewPagerAdapter;
 import com.example.hiichat.Data.StaticConfig;
+import com.example.hiichat.Fragment.FindFragment;
 import com.example.hiichat.Fragment.FriendsFragment;
 import com.example.hiichat.Fragment.GroupFragment;
-import com.example.hiichat.Fragment.MusicFragment;
 import com.example.hiichat.Fragment.UserProfileFragment;
 import com.example.hiichat.Service.ServiceUtils;
 import com.example.hiichat.UI.LoginActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
     private static String TAG = "MainActivity";
-    private ViewPager viewPager;
-    private TabLayout tabLayout = null;
-    public static String STR_MUSIC_FRAGMENT = "MUSIC";
-    public static String STR_FRIEND_FRAGMENT = "FRIEND";
-    public static String STR_GROUP_FRAGMENT = "GROUP";
-    public static String STR_INFO_FRAGMENT = "INFO";
 
 
     private FloatingActionButton floatButton;
@@ -42,89 +33,53 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseUser user;
+    private BottomNavigationView bottomNavigation;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setTitle("HiiChat");
-        }
-
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
         floatButton = (FloatingActionButton) findViewById(R.id.fab);
-        initTab();
+        initBottom();
         initFirebase();
     }
 
-    public void initTab() {
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setSelectedTabIndicatorColor(getResources().getColor(R.color.colorIndivateTab));
-        setupViewPager(viewPager);
-        tabLayout.setupWithViewPager(viewPager);
-        setupTabIcons();
-
+    public void initBottom() {
+        bottomNavigation = findViewById(R.id.bottom_navigation);
+        setUpBottomNavigation();
     }
 
-    private void setupTabIcons() {
-        int[] tabIcons = {
-                R.drawable.ic_tab_music,
-                R.drawable.ic_tab_person,
-                R.drawable.ic_tab_group,
-                R.drawable.ic_tab_infor
-        };
+    private void setUpBottomNavigation() {
+        final FindFragment findFragment = new FindFragment();
+        final FriendsFragment friendsFragment = new FriendsFragment();
+        final GroupFragment groupFragment = new GroupFragment();
+        final UserProfileFragment userProfileFragment = new UserProfileFragment();
 
-        tabLayout.getTabAt(0).setIcon(tabIcons[0]);
-        tabLayout.getTabAt(1).setIcon(tabIcons[1]);
-        tabLayout.getTabAt(2).setIcon(tabIcons[2]);
-        tabLayout.getTabAt(3).setIcon(tabIcons[3]);
-    }
-
-    private void setupViewPager(ViewPager viewPager) {
-        adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFrag(new MusicFragment(), STR_MUSIC_FRAGMENT);
-        adapter.addFrag(new FriendsFragment(), STR_FRIEND_FRAGMENT);
-        adapter.addFrag(new GroupFragment(), STR_GROUP_FRAGMENT);
-        adapter.addFrag(new UserProfileFragment(), STR_INFO_FRAGMENT);
-        //floatButton.setOnClickListener(((MusicFragment) adapter.getItem(0)).onClickFloatButton.getInstance(this));
-        viewPager.setAdapter(adapter);
-        viewPager.setOffscreenPageLimit(4);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                //ServiceUtils.stopServiceFriendChat(MainActivity.this.getApplicationContext(), false);
-                if (adapter.getItem(position) instanceof MusicFragment){
-                    floatButton.setVisibility(View.VISIBLE);
-                    //floatButton.setOnClickListener(((MusicFragment) adapter.getItem(position)).onClickFloatButton.getInstance(MainActivity.this));
-                    floatButton.setImageResource(R.drawable.find);
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.findFriend:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, findFragment).commit();
+                        return true;
+                    case R.id.friend:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, friendsFragment).commit();
+                        return true;
+                    case R.id.group:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, groupFragment).commit();
+                        return true;
+                    case R.id.inFo:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, userProfileFragment).commit();
+                        return true;
                 }
-                else if (adapter.getItem(position) instanceof FriendsFragment) {
-                    floatButton.setVisibility(View.VISIBLE);
-                    floatButton.setOnClickListener(((FriendsFragment) adapter.getItem(position)).onClickFloatButton.getInstance(MainActivity.this));
-                    floatButton.setImageResource(R.drawable.plus);
-                } else if (adapter.getItem(position) instanceof GroupFragment) {
-                    floatButton.setVisibility(View.VISIBLE);
-                    floatButton.setOnClickListener(((GroupFragment) adapter.getItem(position)).onClickFloatButton.getInstance(MainActivity.this));
-                    floatButton.setImageResource(R.drawable.ic_float_add_group);
-                } else {
-                    floatButton.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
+                return true;
             }
         });
     }
+
 
     @Override
     protected void onStart() {
