@@ -15,6 +15,7 @@ import android.text.format.DateFormat;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -33,6 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -89,7 +91,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private static final int REQUEST_IMAGE = 1102;
     //File
     private File filePathImageCamera;
-    private FrameLayout frameLayout;
+    private CardView frameLayout;
     private Toolbar toolbar;
     private boolean isShow = true;
     private FirebaseStorage firebaseStorage;
@@ -97,6 +99,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private String myUrl = "", abc = "";
     private StorageTask uploadTask;
     private ProgressDialog progressDialog;
+    private String sub = "", subStart = "";
 
 
     @Override
@@ -176,16 +179,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void animatorEditText() {
-        final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-
-
-        final LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-
 
         editWriteMessage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
@@ -194,9 +189,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     imgImage.setVisibility(View.GONE);
                     imgMicro.setVisibility(View.GONE);
                     linearLayout2.setVisibility(View.VISIBLE);
-                    r1.setGravity(RelativeLayout.CENTER_VERTICAL);
-                    r1.setLayoutParams(params);
+                    r1.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
                     r1.requestLayout();
+                    editWriteMessage.setText(subStart);
+                    editWriteMessage.setSelection(editWriteMessage.getText().length());
                 }
             }
         });
@@ -208,13 +204,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 imgImage.setVisibility(View.GONE);
                 imgMicro.setVisibility(View.GONE);
                 linearLayout2.setVisibility(View.VISIBLE);
-                r1.setGravity(RelativeLayout.CENTER_VERTICAL);
-                r1.setLayoutParams(params);
+                r1.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
                 r1.requestLayout();
+                editWriteMessage.setText(subStart);
+                editWriteMessage.setSelection(editWriteMessage.getText().length());
             }
         });
         linearLayout2.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
                 editWriteMessage.setHint("Aa");
@@ -222,11 +218,19 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 imgImage.setVisibility(View.VISIBLE);
                 imgMicro.setVisibility(View.VISIBLE);
                 linearLayout2.setVisibility(View.GONE);
-                r1.setGravity(RelativeLayout.CENTER_VERTICAL);
-                r1.setLayoutParams(params1);
+                r1.getLayoutParams().width = RelativeLayout.LayoutParams.WRAP_CONTENT;
                 r1.requestLayout();
+                sub = editWriteMessage.getText().toString().trim();
+                subStart = editWriteMessage.getText().toString().trim();
+                Log.e("sub", sub );
+                focusText(sub);
             }
         });
+    }
+    private void focusText(String sub){
+        if (sub.length() >= 16){
+                editWriteMessage.setText(sub.substring(0,3) + "...");
+        }
     }
 
     private void init() {

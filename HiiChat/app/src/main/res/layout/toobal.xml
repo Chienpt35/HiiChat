@@ -4,7 +4,7 @@
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/grey_800"
+        android:background="@color/colorView"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:theme="@style/AppTheme.AppBarOverlay">
@@ -26,6 +26,7 @@
                 android:background="@android:color/transparent"
                 android:layout_toRightOf="@+id/imgSearch"
                 android:layout_centerVertical="true"
-                android:hint="Tìm bạn bè ..." />
+                android:hint="Tìm bạn bè ..."
+                android:textColorHint="@color/colorWhite"/>
         </RelativeLayout>
     </com.google.android.material.appbar.AppBarLayout>
