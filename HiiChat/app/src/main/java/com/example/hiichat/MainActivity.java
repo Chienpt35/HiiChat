@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.hiichat.Adapter.ViewPagerAdapter;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     public void initBottom() {
         bottomNavigation = findViewById(R.id.bottom_navigation);
         setUpBottomNavigation();
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new FriendsFragment()).commit();
     }
 
     private void setUpBottomNavigation() {
@@ -58,18 +60,19 @@ public class MainActivity extends AppCompatActivity {
         final GroupFragment groupFragment = new GroupFragment();
         final UserProfileFragment userProfileFragment = new UserProfileFragment();
 
+
         bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
-                    case R.id.findFriend:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, findFragment).commit();
-                        return true;
                     case R.id.friend:
                         getSupportFragmentManager().beginTransaction().replace(R.id.content_main, friendsFragment).commit();
                         return true;
                     case R.id.group:
                         getSupportFragmentManager().beginTransaction().replace(R.id.content_main, groupFragment).commit();
+                        return true;
+                    case R.id.findFriend:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, findFragment).commit();
                         return true;
                     case R.id.inFo:
                         getSupportFragmentManager().beginTransaction().replace(R.id.content_main, userProfileFragment).commit();

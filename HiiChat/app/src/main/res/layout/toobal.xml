@@ -27,6 +27,8 @@
                 android:layout_toRightOf="@+id/imgSearch"
                 android:layout_centerVertical="true"
                 android:hint="Tìm bạn bè ..."
-                android:textColorHint="@color/colorWhite"/>
+                android:textColorHint="@color/colorWhite"
+                android:focusable="true"
+                android:focusableInTouchMode="true"/>
         </RelativeLayout>
     </com.google.android.material.appbar.AppBarLayout>

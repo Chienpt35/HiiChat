@@ -9,7 +9,7 @@
         android:id="@+id/btnAddGroup"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@color/grey_500"
+        android:background="@color/colorView"
         android:gravity="center|right"
         android:orientation="horizontal"
         android:paddingRight="20dp">

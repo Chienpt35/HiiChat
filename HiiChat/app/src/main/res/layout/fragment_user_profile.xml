@@ -8,6 +8,7 @@
     tools:context=".Fragment.UserProfileFragment"
     android:orientation="vertical">
 
+    <include layout="@layout/toolbar2" android:id="@+id/include"/>
    <LinearLayout
        android:id="@+id/profile"
        android:background="@color/grey_100"

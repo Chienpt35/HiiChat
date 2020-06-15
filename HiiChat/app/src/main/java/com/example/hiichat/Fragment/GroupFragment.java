@@ -33,6 +33,7 @@ import com.example.hiichat.UI.ChatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -55,6 +56,7 @@ public class GroupFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     public static final int CONTEXT_MENU_LEAVE = 3;
     public static final int REQUEST_EDIT_GROUP = 0;
     public static final String CONTEXT_MENU_KEY_INTENT_DATA_POS = "pos";
+    public FloatingActionButton fab;
 
     LovelyProgressDialog progressDialog, waitingLeavingGroup;
 
@@ -92,6 +94,14 @@ public class GroupFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 .setIcon(R.drawable.ic_dialog_delete_group)
                 .setTitle("Group leaving....")
                 .setTopColorRes(R.color.colorView);
+
+        fab = layout.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickFloatButton.getInstance(getActivity()).onClick(v);
+            }
+        });
 
         if(listGroup.size() == 0){
             //Ket noi server hien thi group

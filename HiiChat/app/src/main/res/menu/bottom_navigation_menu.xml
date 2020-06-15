@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/findFriend"
-        android:enabled="true"
-        android:icon="@drawable/find_friend"
-        android:title="@string/findFriend"/>
-    <item
         android:id="@+id/friend"
         android:enabled="true"
         android:icon="@drawable/ic_tab_person"
@@ -15,6 +10,11 @@
         android:enabled="true"
         android:icon="@drawable/ic_tab_group"
         android:title="@string/group"/>
+    <item
+        android:id="@+id/findFriend"
+        android:enabled="true"
+        android:icon="@drawable/find_friend"
+        android:title="@string/findFriend"/>
     <item
         android:id="@+id/inFo"
         android:enabled="true"

@@ -15,6 +15,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,6 +39,7 @@ import com.example.hiichat.UI.ChatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -71,6 +73,7 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private CountDownTimer detectFriendOnline;
     public static int ACTION_START_CHAT = 1;
+    public FloatingActionButton fab;
 
     public static final String ACTION_DELETE_FRIEND = "DELETE_FRIEND";
 
@@ -118,6 +121,13 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         recyclerListFrends.setLayoutManager(linearLayoutManager);
         mSwipeRefreshLayout = (SwipeRefreshLayout) layout.findViewById(R.id.swipeRefreshLayout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
+        fab = layout.findViewById(R.id.fab);
+        fab.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickFloatButton.getInstance(getActivity()).onClick(v);
+            }
+        });
         adapter = new ListFriendsAdapter(getContext(), dataListFriend, this);
         recyclerListFrends.setAdapter(adapter);
         dialogFindAllFriend = new LovelyProgressDialog(getContext());
@@ -181,7 +191,7 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         getListFriendUId();
     }
 
-    public class FragFriendClickFloatButton implements View.OnClickListener {
+    public class FragFriendClickFloatButton implements OnClickListener {
         Context context;
         LovelyProgressDialog dialogWait;
 
@@ -470,7 +480,7 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         final String avata = listFriend.getListFriend().get(position).avata;
         ((ItemFriendViewHolder) holder).txtName.setText(name);
         ((View) ((ItemFriendViewHolder) holder).txtName.getParent().getParent().getParent())
-                .setOnClickListener(new View.OnClickListener() {
+                .setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
