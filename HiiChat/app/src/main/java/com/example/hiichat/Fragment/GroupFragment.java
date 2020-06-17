@@ -25,6 +25,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.hiichat.Data.FriendDB;
 import com.example.hiichat.Data.GroupDB;
 import com.example.hiichat.Data.StaticConfig;
+import com.example.hiichat.MainActivity;
 import com.example.hiichat.Model.Group;
 import com.example.hiichat.Model.ListFriend;
 import com.example.hiichat.R;
@@ -57,7 +58,6 @@ public class GroupFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     public static final int REQUEST_EDIT_GROUP = 0;
     public static final String CONTEXT_MENU_KEY_INTENT_DATA_POS = "pos";
     public FloatingActionButton fab;
-
     LovelyProgressDialog progressDialog, waitingLeavingGroup;
 
     public GroupFragment() {
@@ -208,7 +208,7 @@ public class GroupFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             case CONTEXT_MENU_EDIT:
                 int posGroup1 = item.getIntent().getIntExtra(CONTEXT_MENU_KEY_INTENT_DATA_POS, -1);
                 if(((String)listGroup.get(posGroup1).groupInfo.get("admin")).equals(StaticConfig.UID)) {
-                    Intent intent = new Intent(getContext(), AddGroupActivity.class);
+                    Intent intent = new Intent(getActivity(), AddGroupActivity.class);
                     intent.putExtra("groupId", listGroup.get(posGroup1).id);
                     startActivityForResult(intent, REQUEST_EDIT_GROUP);
                 }else{
@@ -455,6 +455,7 @@ class ItemGroupViewHolder extends RecyclerView.ViewHolder implements View.OnCrea
         menu.setHeaderTitle((String) ((Object[])btnMore.getTag())[0]);
         Intent data = new Intent();
         data.putExtra(GroupFragment.CONTEXT_MENU_KEY_INTENT_DATA_POS, (Integer) ((Object[])btnMore.getTag())[1]);
+        data.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         menu.add(Menu.NONE, GroupFragment.CONTEXT_MENU_EDIT, Menu.NONE, "Edit group").setIntent(data);
         menu.add(Menu.NONE, GroupFragment.CONTEXT_MENU_DELETE, Menu.NONE, "Delete group").setIntent(data);
         menu.add(Menu.NONE, GroupFragment.CONTEXT_MENU_LEAVE, Menu.NONE, "Leave group").setIntent(data);
