@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton floatButton;
     private ViewPagerAdapter adapter;
-
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseUser user;

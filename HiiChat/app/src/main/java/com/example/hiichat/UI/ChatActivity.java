@@ -38,6 +38,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.TransitionManager;
 
 import com.example.hiichat.Data.SharedPreferenceHelper;
 import com.example.hiichat.Data.StaticConfig;
@@ -82,7 +83,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayoutManager linearLayoutManager;
     public static HashMap<String, Bitmap> bitmapAvataFriend;
     public Bitmap bitmapAvataUser;
-    private LinearLayout linearLayout2, r3;
+    private LinearLayout linearLayout2, linearlayout3;
     private RelativeLayout r1;
     private View rootView;
     private ImageView imgCamera, imgImage, imgMicro, imgSmile, imgResultCamera;
@@ -179,15 +180,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void animatorEditText() {
-
         editWriteMessage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
+                    TransitionManager.beginDelayedTransition(r1);
+                    TransitionManager.beginDelayedTransition(linearLayout2);
+                    TransitionManager.beginDelayedTransition(linearlayout3);
                     editWriteMessage.setHint("Nhập tin nhắn...");
-                    imgCamera.setVisibility(View.GONE);
-                    imgImage.setVisibility(View.GONE);
-                    imgMicro.setVisibility(View.GONE);
+                    linearlayout3.setVisibility(View.GONE);
                     linearLayout2.setVisibility(View.VISIBLE);
                     r1.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
                     r1.requestLayout();
@@ -199,10 +200,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         editWriteMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                TransitionManager.beginDelayedTransition(r1);
+                TransitionManager.beginDelayedTransition(linearLayout2);
+                TransitionManager.beginDelayedTransition(linearlayout3);
                 editWriteMessage.setHint("Nhập tin nhắn...");
-                imgCamera.setVisibility(View.GONE);
-                imgImage.setVisibility(View.GONE);
-                imgMicro.setVisibility(View.GONE);
+                linearlayout3.setVisibility(View.GONE);
                 linearLayout2.setVisibility(View.VISIBLE);
                 r1.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
                 r1.requestLayout();
@@ -213,10 +215,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         linearLayout2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                TransitionManager.beginDelayedTransition(r1);
+                TransitionManager.beginDelayedTransition(linearLayout2);
+                TransitionManager.beginDelayedTransition(linearlayout3);
                 editWriteMessage.setHint("Aa");
-                imgCamera.setVisibility(View.VISIBLE);
-                imgImage.setVisibility(View.VISIBLE);
-                imgMicro.setVisibility(View.VISIBLE);
+                linearlayout3.setVisibility(View.VISIBLE);
                 linearLayout2.setVisibility(View.GONE);
                 r1.getLayoutParams().width = RelativeLayout.LayoutParams.WRAP_CONTENT;
                 r1.requestLayout();
@@ -237,7 +240,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         progressDialog = new ProgressDialog(this);
         linearLayout2 = findViewById(R.id.linearlayout2);
         r1 = findViewById(R.id.r1);
-        r3 = findViewById(R.id.r3);
+        linearlayout3 = findViewById(R.id.linearlayout3);
         consersation = new Consersation();
         btnSend = (ImageButton) findViewById(R.id.btnSend);
         btnSend.setOnClickListener(this);
