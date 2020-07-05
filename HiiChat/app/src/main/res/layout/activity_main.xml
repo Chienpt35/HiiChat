@@ -25,7 +25,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/grey_800"
+        android:background="@color/grey_200"
         android:layout_above="@+id/bottom_navigation"/>
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
@@ -36,6 +36,6 @@
         app:labelVisibilityMode="labeled"
         app:itemIconTint="@drawable/item_bottom_select"
         app:itemTextColor="@drawable/item_bottom_select"
-        android:background="@color/colorWhite"/>
+        android:background="@color/grey_100"/>
 
 </RelativeLayout>

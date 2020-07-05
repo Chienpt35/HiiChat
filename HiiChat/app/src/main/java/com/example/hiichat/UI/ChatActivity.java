@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,6 +48,8 @@ import com.example.hiichat.Model.Message;
 import com.example.hiichat.R;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -58,9 +61,14 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -86,7 +94,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout linearLayout2, linearlayout3;
     private RelativeLayout r1;
     private View rootView;
-    private ImageView imgCamera, imgImage, imgMicro, imgSmile, imgResultCamera;
+    private ImageView imgCamera, imgImage, imgMicro, imgSmile, imgResultCamera, imgVideoCall;
     private EmojIconActions emojIcon;
     private static final int REQUEST_CAMERA = 6789;
     private static final int REQUEST_IMAGE = 1102;
@@ -100,7 +108,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private String myUrl = "", abc = "";
     private StorageTask uploadTask;
     private ProgressDialog progressDialog;
-    private String sub = "", subStart = "";
+    private String sub = "", subStart = "", mCurrentPhotoPath = "";
 
 
     @Override
@@ -143,13 +151,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     if (dataSnapshot.getValue() != null) {
                         HashMap mapMessage = (HashMap) dataSnapshot.getValue();
-                        Message newMessage = new Message();
-                        newMessage.idSender = (String) mapMessage.get("idSender");
-                        newMessage.idReceiver = (String) mapMessage.get("idReceiver");
-                        newMessage.text = (String) mapMessage.get("text");
-                        newMessage.type = (String) mapMessage.get("type");
-                        newMessage.timestamp = (long) mapMessage.get("timestamp");
-                        consersation.getListMessageData().add(newMessage);
+                        Message message = new Message();
+                        message.idSender = (String) mapMessage.get("idSender");
+                        message.idReceiver = (String) mapMessage.get("idReceiver");
+                        message.text = (String) mapMessage.get("text");
+                        message.type = (String) mapMessage.get("type");
+                        message.timestamp = (long) mapMessage.get("timestamp");
+                        consersation.getListMessageData().add(message);
                         adapter.notifyDataSetChanged();
                         linearLayoutManager.scrollToPosition(consersation.getListMessageData().size() - 1);
                     }
@@ -260,12 +268,21 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         imgResultCamera = findViewById(R.id.imgResultCamera);
         frameLayout = findViewById(R.id.frameLayout);
 
+        imgVideoCall = findViewById(R.id.imgVideoCall);
+        imgVideoCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChatActivity.this, CallingActivity.class);
+                startActivity(intent);
+            }
+        });
+
         editWriteMessage = findViewById(R.id.editWriteMessage);
 
         imgCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                photoCameraIntent();
+                dispatchTakePictureIntent();
             }
         });
 
@@ -290,24 +307,25 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void photoCameraIntent() {
-        Intent it = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(it, REQUEST_CAMERA);
-    }
-
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == REQUEST_CAMERA && resultCode == RESULT_OK && data != null) {
+
             frameLayout.setVisibility(View.VISIBLE);
             Bitmap bitmap = (Bitmap) data.getExtras().get("data");
             imgResultCamera.setImageBitmap(bitmap);
-            imgResultCamera.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    frameLayout.setVisibility(View.GONE);
-                }
-            });
+//            frameLayout.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Uri imageUri = data.getData();
+//
+//                    sendImage(imageUri);
+//                    frameLayout.setVisibility(View.GONE);
+//                }
+//            });
         }
 
         if (requestCode == REQUEST_IMAGE && resultCode == RESULT_OK && data != null) {
@@ -336,13 +354,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         Uri downloadUrl = (Uri) task.getResult();
                         myUrl = downloadUrl.toString();
 
-                        Message newMessage = new Message();
-                        newMessage.text = myUrl;
-                        newMessage.idSender = StaticConfig.UID;
-                        newMessage.idReceiver = roomId;
-                        newMessage.type = "image";
-                        newMessage.timestamp = System.currentTimeMillis();
-                        FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage);
+                        Message newMessage2 = new Message();
+                        newMessage2.text = myUrl;
+                        newMessage2.idSender = StaticConfig.UID;
+                        newMessage2.idReceiver = roomId;
+                        newMessage2.type = "image";
+                        newMessage2.timestamp = System.currentTimeMillis();
+                        FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage2);
                         progressDialog.dismiss();
                     }
                 }
@@ -350,7 +368,70 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
-        super.onActivityResult(requestCode, resultCode, data);
+
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.hiichat.provider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCurrentPhotoPath);
+                startActivityForResult(takePictureIntent, REQUEST_CAMERA);
+            }
+        }
+    }
+
+    private void sendImage(Uri imageUri) {
+        StorageReference storageReference1 = FirebaseStorage.getInstance().getReference().child("Image File");
+        StorageTask storageTask = storageReference1.putFile(imageUri);
+        storageTask.addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                Uri downloadUrl = (Uri) task.getResult();
+                myUrl = downloadUrl.toString();
+
+                Message newMessage3 = new Message();
+                newMessage3.text = myUrl;
+                newMessage3.idSender = StaticConfig.UID;
+                newMessage3.idReceiver = roomId;
+                newMessage3.type = "image";
+                newMessage3.timestamp = System.currentTimeMillis();
+                FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage3);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(ChatActivity.this, "Tải Lên Lỗi !!!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -378,13 +459,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             String content = editWriteMessage.getText().toString().trim();
             if (content.length() > 0) {
                 editWriteMessage.setText("");
-                Message newMessage = new Message();
-                newMessage.text = content;
-                newMessage.idSender = StaticConfig.UID;
-                newMessage.idReceiver = roomId;
-                newMessage.type = "text";
-                newMessage.timestamp = System.currentTimeMillis();
-                FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage);
+                Message newMessage1 = new Message();
+                newMessage1.text = content;
+                newMessage1.idSender = StaticConfig.UID;
+                newMessage1.idReceiver = roomId;
+                newMessage1.type = "text";
+                newMessage1.timestamp = System.currentTimeMillis();
+                FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage1);
             }
         }
     }
@@ -419,7 +500,7 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ItemMessageFriendHolder) {
             if (consersation.getListMessageData().get(position).type.equals("text")) {
                 ((ItemMessageFriendHolder) holder).txtContent.setText(consersation.getListMessageData().get(position).text);
@@ -454,10 +535,20 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             }else if (consersation.getListMessageData().get(position).type.equals("image")){
                 ((ItemMessageFriendHolder) holder).txtContent.setVisibility(View.GONE);
-                ((ItemMessageFriendHolder) holder).imgImageFriend.setVisibility(View.VISIBLE);
+
                 Picasso.get()
                         .load(consersation.getListMessageData().get(position).text)
-                        .into(((ItemMessageFriendHolder) holder).imgImageFriend);
+                        .into(((ItemMessageFriendHolder) holder).imgMessageFriend, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                ((ItemMessageFriendHolder) holder).imgImageFriend.setVisibility(View.VISIBLE);
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+
+                            }
+                        });
             }
         } else if (holder instanceof ItemMessageUserHolder) {
             if (consersation.getListMessageData().get(position).type.equals("text")){
@@ -467,10 +558,19 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             }else if (consersation.getListMessageData().get(position).type.equals("image")){
                 ((ItemMessageUserHolder) holder).txtContent.setVisibility(View.GONE);
-                ((ItemMessageUserHolder) holder).imgImageUser.setVisibility(View.VISIBLE);
                 Picasso.get()
                         .load(consersation.getListMessageData().get(position).text)
-                        .into(((ItemMessageUserHolder) holder).imgImageUser);
+                        .into(((ItemMessageUserHolder) holder).imgMessageUser, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                ((ItemMessageUserHolder) holder).imgImageUser.setVisibility(View.VISIBLE);
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+
+                            }
+                        });
             }
         }
     }
@@ -489,25 +589,35 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 class ItemMessageUserHolder extends RecyclerView.ViewHolder {
     public TextView txtContent;
     public CircleImageView avata;
-    public ImageView imgImageUser;
+    public CardView imgImageUser;
+    public ImageView imgMessageUser;
+
+
+
 
     public ItemMessageUserHolder(View itemView) {
         super(itemView);
         txtContent = (TextView) itemView.findViewById(R.id.textContentUser);
         avata = (CircleImageView) itemView.findViewById(R.id.imageView2);
         imgImageUser = itemView.findViewById(R.id.imgImageUser);
+        imgMessageUser = (ImageView) itemView.findViewById(R.id.imgMessageUser);
     }
 }
 
 class ItemMessageFriendHolder extends RecyclerView.ViewHolder {
     public TextView txtContent;
     public CircleImageView avata;
-    public ImageView imgImageFriend;
+    public CardView imgImageFriend;
+    public ImageView imgMessageFriend;
+
+
+
 
     public ItemMessageFriendHolder(View itemView) {
         super(itemView);
         txtContent = (TextView) itemView.findViewById(R.id.textContentFriend);
         avata = (CircleImageView) itemView.findViewById(R.id.imageView3);
         imgImageFriend = itemView.findViewById(R.id.imgImageFriend);
+        imgMessageFriend = (ImageView) itemView.findViewById(R.id.imgMessageFriend);
     }
 }

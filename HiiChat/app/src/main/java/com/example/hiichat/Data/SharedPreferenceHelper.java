@@ -38,7 +38,7 @@ public class SharedPreferenceHelper {
     public User getUserInfo() {
         String usename = preferences.getString(SHARE_KEY_NAME, "");
         String email = preferences.getString(SHARE_KEY_EMAIL, "");
-        String avata = preferences.getString(SHARE_KEY_AVATA, "");
+        String avata = preferences.getString(SHARE_KEY_AVATA, "default");
 
         User user = new User();
         user.name = usename;

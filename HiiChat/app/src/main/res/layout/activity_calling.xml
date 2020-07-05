@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UI.CallingActivity"
+    android:background="@drawable/background_call">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/img_avatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/default_avata"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="200dp"/>
+    <TextView
+        android:id="@+id/tv_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_below="@+id/img_avatar"
+        android:text="username"
+        android:textSize="40dp"
+        android:textColor="@color/colorWhite"
+        android:layout_centerHorizontal="true"/>
+    <TextView
+        android:id="@+id/tv_calling"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_below="@+id/tv_username"
+        android:text="Calling..."
+        android:textSize="30dp"
+        android:textColor="@color/colorWhite"
+        android:layout_centerHorizontal="true"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/tv_calling"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="100dp"
+        android:layout_centerHorizontal="true">
+
+        <ImageView
+            android:id="@+id/img_makeCall"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/make_call"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="50dp"/>
+        <ImageView
+            android:id="@+id/img_cancelCall"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/cancel_call"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="50dp"/>
+    </RelativeLayout>
+</RelativeLayout>

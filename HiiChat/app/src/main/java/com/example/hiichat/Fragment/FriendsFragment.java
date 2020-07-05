@@ -95,8 +95,8 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         detectFriendOnline = new CountDownTimer(System.currentTimeMillis(), StaticConfig.TIME_TO_REFRESH) {
             @Override
             public void onTick(long l) {
-                ServiceUtils.updateFriendStatus(getContext(), dataListFriend);
-                ServiceUtils.updateUserStatus(getContext());
+                    ServiceUtils.updateFriendStatus(getContext(), dataListFriend);
+                    ServiceUtils.updateUserStatus(getContext());
             }
 
             @Override
@@ -536,6 +536,7 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         return true;
                     }
                 });
+
 
 
         if (listFriend.getListFriend().get(position).message.text.length() > 0) {
