@@ -39,7 +39,14 @@
         android:layout_toLeftOf="@id/imageView2"
         app:cardCornerRadius="10dp"
         android:layout_marginEnd="10dp"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/grey_800">
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            style="@android:style/Widget.Holo.ProgressBar"/>
         <ImageView
             android:id="@+id/imgMessageUser"
             android:layout_width="match_parent"

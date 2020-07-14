@@ -3,12 +3,16 @@ package com.example.hiichat.UI;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.format.DateFormat;
@@ -21,11 +25,13 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,11 +42,13 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.TransitionManager;
 
+import com.example.hiichat.BuildConfig;
 import com.example.hiichat.Data.SharedPreferenceHelper;
 import com.example.hiichat.Data.StaticConfig;
 import com.example.hiichat.Model.Consersation;
@@ -63,8 +71,11 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Callback;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -109,6 +120,31 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private StorageTask uploadTask;
     private ProgressDialog progressDialog;
     private String sub = "", subStart = "", mCurrentPhotoPath = "";
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+    private File photoFile;
+    private MediaRecorder myAudioRecorder;
+    private RelativeLayout layoutMicro;
+    private TextView tvtTime;
+    private ImageView imgMicroOn;
+    private ImageView imgMicroOff;
+    private CountDownTimer countDownTimer;
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @Override
@@ -133,9 +169,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         getListMassage();
 
-
     }
-
 
     private void getListMassage() {
         if (idFriend != null && nameFriend != null && toolbar != null) {
@@ -145,7 +179,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
             recyclerChat = (RecyclerView) findViewById(R.id.recyclerChat);
             recyclerChat.setLayoutManager(linearLayoutManager);
-            adapter = new ListMessageAdapter(this, consersation, bitmapAvataFriend, bitmapAvataUser);
+            adapter = new ListMessageAdapter(ChatActivity.this, consersation, bitmapAvataFriend, bitmapAvataUser);
             FirebaseDatabase.getInstance().getReference().child("message/" + roomId).addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -158,8 +192,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         message.type = (String) mapMessage.get("type");
                         message.timestamp = (long) mapMessage.get("timestamp");
                         consersation.getListMessageData().add(message);
-                        adapter.notifyDataSetChanged();
-                        linearLayoutManager.scrollToPosition(consersation.getListMessageData().size() - 1);
+                        adapter.notifyItemChanged(consersation.getListMessageData().size() - 1);
+                        recyclerChat.scrollToPosition(recyclerChat.getAdapter().getItemCount() - 1);
                     }
                 }
 
@@ -170,7 +204,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                    adapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -200,6 +234,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     linearLayout2.setVisibility(View.VISIBLE);
                     r1.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
                     r1.requestLayout();
+                    subStart = editWriteMessage.getText().toString().trim();
                     editWriteMessage.setText(subStart);
                     editWriteMessage.setSelection(editWriteMessage.getText().length());
                 }
@@ -216,6 +251,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 linearLayout2.setVisibility(View.VISIBLE);
                 r1.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
                 r1.requestLayout();
+                subStart = editWriteMessage.getText().toString().trim();
                 editWriteMessage.setText(subStart);
                 editWriteMessage.setSelection(editWriteMessage.getText().length());
             }
@@ -260,10 +296,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         toolbar = findViewById(R.id.toolbar);
-
+        tvtTime = (TextView) findViewById(R.id.tvt_time);
+        imgMicroOn = (ImageView) findViewById(R.id.imgMicroOn);
+        imgMicroOff = (ImageView) findViewById(R.id.imgMicroOff);
         imgCamera = findViewById(R.id.imgCamera);
         imgImage = findViewById(R.id.imgImage);
         imgMicro = findViewById(R.id.imgMicro);
+        myAudioRecorder = new MediaRecorder();
+        layoutMicro = (RelativeLayout) findViewById(R.id.layoutMicro);
+
+
+        setCountDownTimer();
+
+
+
         imgSmile = findViewById(R.id.imgSmile);
         imgResultCamera = findViewById(R.id.imgResultCamera);
         frameLayout = findViewById(R.id.frameLayout);
@@ -282,7 +328,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         imgCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dispatchTakePictureIntent();
+                verifyStoragePermissions();
             }
         });
 
@@ -305,6 +351,64 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+
+
+    }
+
+
+    //thời gian đếm ngược
+    private void setCountDownTimer() {
+        countDownTimer = new CountDownTimer(60000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                String v = String.format("%02d", millisUntilFinished/60000);
+                int va = (int)( (millisUntilFinished%60000)/1000);
+                tvtTime.setText(v+":"+String.format("%02d",va));
+            }
+
+            @Override
+            public void onFinish() {
+                tvtTime.setText("done!");
+            }
+        };
+
+        imgMicroOn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                countDownTimer.start();
+                imgMicroOn.setVisibility(View.GONE);
+                imgMicroOff.setVisibility(View.VISIBLE);
+            }
+        });
+
+
+        imgMicroOff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                countDownTimer.cancel();
+                countDownTimer.onTick(60000);
+                imgMicroOff.setVisibility(View.GONE);
+                imgMicroOn.setVisibility(View.VISIBLE);
+            }
+        });
+        imgMicro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TransitionManager.beginDelayedTransition(layoutMicro);
+                if (layoutMicro.getVisibility() == View.GONE){
+                    layoutMicro.setVisibility(View.VISIBLE);
+                    countDownTimer.onTick(60000);
+
+                }else {
+                    layoutMicro.setVisibility(View.GONE);
+                    countDownTimer.cancel();
+                    if (imgMicroOff.getVisibility() == View.VISIBLE){
+                        imgMicroOff.setVisibility(View.GONE);
+                        imgMicroOn.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
     }
 
 
@@ -312,20 +416,21 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, @Nullable final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_CAMERA && resultCode == RESULT_OK && data != null) {
-
+        if (requestCode == REQUEST_CAMERA && resultCode == RESULT_OK) {
             frameLayout.setVisibility(View.VISIBLE);
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-            imgResultCamera.setImageBitmap(bitmap);
-//            frameLayout.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Uri imageUri = data.getData();
-//
-//                    sendImage(imageUri);
-//                    frameLayout.setVisibility(View.GONE);
-//                }
-//            });
+            final StorageReference storageReference1 = FirebaseStorage.getInstance().getReference().child("Image File");
+            final StorageReference storageReference2 = storageReference1.child(mCurrentPhotoPath);
+            final Uri photoURI = FileProvider.getUriForFile(ChatActivity.this,
+                    BuildConfig.APPLICATION_ID + ".provider",
+                    photoFile);
+            imgResultCamera.setImageURI(photoURI);
+            frameLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sendImage(storageReference2, photoURI);
+                    frameLayout.setVisibility(View.GONE);
+                }
+            });
         }
 
         if (requestCode == REQUEST_IMAGE && resultCode == RESULT_OK && data != null) {
@@ -376,23 +481,24 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        Log.e("storageDir", storageDir + "" );
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
         // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
+        mCurrentPhotoPath = imageFileName + "camera.jpg";
         return image;
     }
 
     private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent takePictureIntent = new Intent();
+        takePictureIntent.setAction(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
-            File photoFile = null;
+            photoFile = null;
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
@@ -401,34 +507,42 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.hiichat.provider",
+                        BuildConfig.APPLICATION_ID + ".provider",
                         photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCurrentPhotoPath);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_CAMERA);
             }
         }
     }
 
-    private void sendImage(Uri imageUri) {
-        StorageReference storageReference1 = FirebaseStorage.getInstance().getReference().child("Image File");
-        StorageTask storageTask = storageReference1.putFile(imageUri);
+    private void sendImage(final StorageReference storageReference, Uri imageUri) {
+        progressDialog.show();
+        progressDialog.setTitle("Sending Image");
+        progressDialog.setMessage("Please wait, we are sending that file...");
+        StorageTask storageTask = storageReference.putFile(imageUri);
         storageTask.addOnCompleteListener(new OnCompleteListener() {
             @Override
             public void onComplete(@NonNull Task task) {
-                Uri downloadUrl = (Uri) task.getResult();
-                myUrl = downloadUrl.toString();
+                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        String myUrl1 = uri.toString();
 
-                Message newMessage3 = new Message();
-                newMessage3.text = myUrl;
-                newMessage3.idSender = StaticConfig.UID;
-                newMessage3.idReceiver = roomId;
-                newMessage3.type = "image";
-                newMessage3.timestamp = System.currentTimeMillis();
-                FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage3);
+                        Message newMessage3 = new Message();
+                        newMessage3.text = myUrl1;
+                        newMessage3.idSender = StaticConfig.UID;
+                        newMessage3.idReceiver = roomId;
+                        newMessage3.type = "image";
+                        newMessage3.timestamp = System.currentTimeMillis();
+                        FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage3);
+                        progressDialog.dismiss();
+                    }
+                });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                progressDialog.dismiss();
                 Toast.makeText(ChatActivity.this, "Tải Lên Lỗi !!!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -469,6 +583,39 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+
+    public void verifyStoragePermissions() {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(ChatActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    ChatActivity.this,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }else{
+            // we already have permission, lets go ahead and call camera intent
+            dispatchTakePictureIntent();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case REQUEST_EXTERNAL_STORAGE:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted
+                    dispatchTakePictureIntent();
+                }else {
+                    Toast.makeText(this, "Bạn cần cấp quyền truy cập máy ảnh cho ứng dụng !!!", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
 }
 
 class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -500,7 +647,7 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof ItemMessageFriendHolder) {
             if (consersation.getListMessageData().get(position).type.equals("text")) {
                 ((ItemMessageFriendHolder) holder).txtContent.setText(consersation.getListMessageData().get(position).text);
@@ -522,7 +669,7 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                     } else {
                                         ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
                                     }
-                                    notifyDataSetChanged();
+                                        notifyDataSetChanged();
                                 }
                             }
 
@@ -535,20 +682,12 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             }else if (consersation.getListMessageData().get(position).type.equals("image")){
                 ((ItemMessageFriendHolder) holder).txtContent.setVisibility(View.GONE);
-
+                ((ItemMessageFriendHolder) holder).imgImageFriend.setVisibility(View.VISIBLE);
                 Picasso.get()
                         .load(consersation.getListMessageData().get(position).text)
-                        .into(((ItemMessageFriendHolder) holder).imgMessageFriend, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                ((ItemMessageFriendHolder) holder).imgImageFriend.setVisibility(View.VISIBLE);
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-
-                            }
-                        });
+//                        .networkPolicy(NetworkPolicy.NO_CACHE)
+//                        .memoryPolicy(MemoryPolicy.NO_CACHE)
+                        .into(((ItemMessageFriendHolder) holder).imgMessageFriend);
             }
         } else if (holder instanceof ItemMessageUserHolder) {
             if (consersation.getListMessageData().get(position).type.equals("text")){
@@ -558,19 +697,12 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             }else if (consersation.getListMessageData().get(position).type.equals("image")){
                 ((ItemMessageUserHolder) holder).txtContent.setVisibility(View.GONE);
+                ((ItemMessageUserHolder) holder).imgImageUser.setVisibility(View.VISIBLE);
                 Picasso.get()
                         .load(consersation.getListMessageData().get(position).text)
-                        .into(((ItemMessageUserHolder) holder).imgMessageUser, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                ((ItemMessageUserHolder) holder).imgImageUser.setVisibility(View.VISIBLE);
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-
-                            }
-                        });
+//                        .networkPolicy(NetworkPolicy.NO_CACHE)
+//                        .memoryPolicy(MemoryPolicy.NO_CACHE)
+                        .into(((ItemMessageUserHolder) holder).imgMessageUser);
             }
         }
     }
@@ -591,8 +723,7 @@ class ItemMessageUserHolder extends RecyclerView.ViewHolder {
     public CircleImageView avata;
     public CardView imgImageUser;
     public ImageView imgMessageUser;
-
-
+    public ProgressBar progressBar;
 
 
     public ItemMessageUserHolder(View itemView) {
@@ -601,6 +732,7 @@ class ItemMessageUserHolder extends RecyclerView.ViewHolder {
         avata = (CircleImageView) itemView.findViewById(R.id.imageView2);
         imgImageUser = itemView.findViewById(R.id.imgImageUser);
         imgMessageUser = (ImageView) itemView.findViewById(R.id.imgMessageUser);
+        progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
     }
 }
 
@@ -609,8 +741,7 @@ class ItemMessageFriendHolder extends RecyclerView.ViewHolder {
     public CircleImageView avata;
     public CardView imgImageFriend;
     public ImageView imgMessageFriend;
-
-
+    public ProgressBar progressBar;
 
 
     public ItemMessageFriendHolder(View itemView) {
@@ -619,5 +750,6 @@ class ItemMessageFriendHolder extends RecyclerView.ViewHolder {
         avata = (CircleImageView) itemView.findViewById(R.id.imageView3);
         imgImageFriend = itemView.findViewById(R.id.imgImageFriend);
         imgMessageFriend = (ImageView) itemView.findViewById(R.id.imgMessageFriend);
+        progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
     }
 }

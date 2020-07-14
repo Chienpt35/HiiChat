@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">HiiChat</string>
     <string name="login">LOGIN</string>
     <string name="Email">Email</string>
