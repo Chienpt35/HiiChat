@@ -1,5 +1,7 @@
 package com.example.hiichat.UI;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -43,6 +45,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -109,42 +112,27 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private EmojIconActions emojIcon;
     private static final int REQUEST_CAMERA = 6789;
     private static final int REQUEST_IMAGE = 1102;
-    //File
-    private File filePathImageCamera;
     private CardView frameLayout;
     private Toolbar toolbar;
-    private boolean isShow = true;
-    private FirebaseStorage firebaseStorage;
     private Uri fileUri;
-    private String myUrl = "", abc = "";
+    private String myUrl = "";
     private StorageTask uploadTask;
     private ProgressDialog progressDialog;
-    private String sub = "", subStart = "", mCurrentPhotoPath = "";
+    private String sub = "", subStart = "", mCurrentPhotoPath = "", microFileName;
+    private  File filePathMicro = null;
     // Storage Permissions
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static final int REQUEST_EXTERNAL_STORAGE = 1, REQUEST_MICROPHONE = 2;
     private static String[] PERMISSIONS_STORAGE = {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
     private File photoFile;
-    private MediaRecorder myAudioRecorder;
+    private MediaRecorder recorder;
     private RelativeLayout layoutMicro;
     private TextView tvtTime;
     private ImageView imgMicroOn;
     private ImageView imgMicroOff;
     private CountDownTimer countDownTimer;
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     @Override
@@ -280,6 +268,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void init() {
         progressDialog = new ProgressDialog(this);
         linearLayout2 = findViewById(R.id.linearlayout2);
@@ -302,12 +291,33 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         imgCamera = findViewById(R.id.imgCamera);
         imgImage = findViewById(R.id.imgImage);
         imgMicro = findViewById(R.id.imgMicro);
-        myAudioRecorder = new MediaRecorder();
         layoutMicro = (RelativeLayout) findViewById(R.id.layoutMicro);
-
 
         setCountDownTimer();
 
+        //create file micro
+        File outputFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MediaMaster/Dub/");
+        filePathMicro = new File(outputFolder.getAbsolutePath()+"out" + new Date().getTime() + ".3gpp");
+
+        imgMicro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                verifyMicroPermissions();
+            }
+        });
+        imgMicroOn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    startRecording();
+                    Log.e("Recording", " Recording start...");
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    stopRecording();
+                    Log.e("Recording", " Recording stop...");
+                }
+                return  true;
+            }
+        });
 
 
         imgSmile = findViewById(R.id.imgSmile);
@@ -350,9 +360,64 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 emojIcon.ShowEmojIcon();
             }
         });
+    }
 
+    private void startRecording() {
+        countDownTimer.onTick(60000);
+        countDownTimer.start();
+        if (recorder == null){
+            recorder = new MediaRecorder();
+            recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            recorder.setAudioEncodingBitRate(128000);
+            recorder.setAudioSamplingRate(96000);
+            recorder.setOutputFile(filePathMicro.getAbsolutePath());
+            try {
+                recorder.prepare();
+                recorder.start();
+            } catch (IOException e) {
+                Log.e("LOG_TAG", "prepare() failed" + e.getMessage());
+            }catch (IllegalStateException e){
+                e.printStackTrace();
+            }
+        }
+    }
+    private void stopRecording(){
+            layoutMicro.setVisibility(View.GONE);
+            countDownTimer.cancel();
+            try{
+                recorder.stop();
+                recorder.reset();
+                recorder.release();
+            }catch(RuntimeException stopException){
+                //handle cleanup here
+                Log.d("TAG"," message derreure " + stopException.getMessage());
+            }
+            recorder = null;
+            uploadAudio();
+    }
 
-
+    private void uploadAudio() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        microFileName = timeStamp + "_recorder.3gp";
+        final StorageReference fii = FirebaseStorage.getInstance().getReference().child("Recording File").child(microFileName);
+        Uri uri = Uri.fromFile(new File(filePathMicro.getAbsolutePath()));
+        fii.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(ChatActivity.this, "Vocal Save to db storage", Toast.LENGTH_SHORT).show();
+                fii.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        //trong nay se goi ham them message
+                        //nay lam den day thoi
+                        //buon ngu vcl roi
+                        //ngu som mai con di lam :))
+                    }
+                });
+            }
+        });
     }
 
 
@@ -369,48 +434,33 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFinish() {
                 tvtTime.setText("done!");
+                stopRecording();
             }
         };
+    }
+    private void verifyMicroPermissions(){
+        if (ContextCompat.checkSelfPermission(ChatActivity.this,
+                Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
 
-        imgMicroOn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                countDownTimer.start();
-                imgMicroOn.setVisibility(View.GONE);
-                imgMicroOff.setVisibility(View.VISIBLE);
-            }
-        });
-
-
-        imgMicroOff.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                countDownTimer.cancel();
-                countDownTimer.onTick(60000);
-                imgMicroOff.setVisibility(View.GONE);
-                imgMicroOn.setVisibility(View.VISIBLE);
-            }
-        });
-        imgMicro.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TransitionManager.beginDelayedTransition(layoutMicro);
-                if (layoutMicro.getVisibility() == View.GONE){
-                    layoutMicro.setVisibility(View.VISIBLE);
-                    countDownTimer.onTick(60000);
-
-                }else {
-                    layoutMicro.setVisibility(View.GONE);
-                    countDownTimer.cancel();
-                    if (imgMicroOff.getVisibility() == View.VISIBLE){
-                        imgMicroOff.setVisibility(View.GONE);
-                        imgMicroOn.setVisibility(View.VISIBLE);
-                    }
-                }
-            }
-        });
+            ActivityCompat.requestPermissions(ChatActivity.this,
+                    new String[]{Manifest.permission.RECORD_AUDIO},
+                    REQUEST_MICROPHONE);
+        }else {
+            //gọi hàm hiển thị view micro
+            showOrHideViewMicro();
+        }
     }
 
+    private void showOrHideViewMicro(){
+        TransitionManager.beginDelayedTransition(layoutMicro);
+        if (layoutMicro.getVisibility() == View.GONE){
+            countDownTimer.onTick(60000);
+            layoutMicro.setVisibility(View.VISIBLE);
+            Toast.makeText(this, "Nhấn giữ để ghi âm, thả để gửi !", Toast.LENGTH_LONG).show();
+        }else {
+            layoutMicro.setVisibility(View.GONE);
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable final Intent data) {
@@ -612,6 +662,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     dispatchTakePictureIntent();
                 }else {
                     Toast.makeText(this, "Bạn cần cấp quyền truy cập máy ảnh cho ứng dụng !!!", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case REQUEST_MICROPHONE:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted
+                    //gọi hàm hiển thị view micro
+                    showOrHideViewMicro();
+                }else {
+                    Toast.makeText(this, "Bạn cần cấp quyền truy cập micro cho ứng dụng !!!", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
