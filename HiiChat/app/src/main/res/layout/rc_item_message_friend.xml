@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout2"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -17,6 +18,33 @@
         android:layout_marginStart="5dp"
         android:src="@drawable/default_avata"/>
 
+    <me.jagar.chatvoiceplayerlibrary.VoicePlayerView
+        android:id="@+id/voicePlayerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:enableVisualizer="false"
+        app:visualizationPlayedColor="#63FF7700"
+        app:visualizationNotPlayedColor="#727171"
+        app:playPauseBackgroundColor="#8BC34A"
+        app:timingBackgroundColor="#8BC34A"
+        app:seekBarProgressColor="#000"
+        app:showShareButton="true"
+        app:shareCornerRadius="100"
+        app:playPauseCornerRadius="100"
+        app:showTiming="true"
+        app:viewCornerRadius="100"
+        app:viewBackground="#54C6C4CF"
+        app:progressTimeColor="#000"
+        app:seekBarThumbColor="#8BC34A"
+        app:shareBackgroundColor="#ff7700"
+        app:playProgressbarColor="#ff7700"
+        app:shareText="SHARE ME"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@id/imageView3"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="20dp"
+        android:visibility="gone"/>
+
     <TextView
         android:id="@+id/textContentFriend"
         android:layout_width="wrap_content"
@@ -27,7 +55,6 @@
         android:layout_toEndOf="@id/imageView3"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="20dp"
-        android:text="A"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#000"
         android:visibility="visible" />

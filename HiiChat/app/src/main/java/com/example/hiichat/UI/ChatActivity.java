@@ -90,6 +90,7 @@ import java.util.HashMap;
 import de.hdodenhof.circleimageview.CircleImageView;
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
+import me.jagar.chatvoiceplayerlibrary.VoicePlayerView;
 
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
@@ -192,7 +193,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-                    adapter.notifyDataSetChanged();
+
                 }
 
                 @Override
@@ -406,14 +407,18 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         fii.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(ChatActivity.this, "Vocal Save to db storage", Toast.LENGTH_SHORT).show();
                 fii.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        //trong nay se goi ham them message
-                        //nay lam den day thoi
-                        //buon ngu vcl roi
-                        //ngu som mai con di lam :))
+                        String myUrl2 = uri.toString();
+
+                        Message newMessage4 = new Message();
+                        newMessage4.text = myUrl2;
+                        newMessage4.idSender = StaticConfig.UID;
+                        newMessage4.idReceiver = roomId;
+                        newMessage4.type = "media";
+                        newMessage4.timestamp = System.currentTimeMillis();
+                        FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage4);
                     }
                 });
             }
@@ -745,9 +750,12 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 ((ItemMessageFriendHolder) holder).imgImageFriend.setVisibility(View.VISIBLE);
                 Picasso.get()
                         .load(consersation.getListMessageData().get(position).text)
-//                        .networkPolicy(NetworkPolicy.NO_CACHE)
-//                        .memoryPolicy(MemoryPolicy.NO_CACHE)
                         .into(((ItemMessageFriendHolder) holder).imgMessageFriend);
+            }
+            else if (consersation.getListMessageData().get(position).type.equals("media")){
+                ((ItemMessageFriendHolder) holder).txtContent.setVisibility(View.GONE);
+                ((ItemMessageFriendHolder) holder).voicePlayerView.setVisibility(View.VISIBLE);
+                ((ItemMessageFriendHolder) holder).voicePlayerView.setAudio(consersation.getListMessageData().get(position).text);
             }
         } else if (holder instanceof ItemMessageUserHolder) {
             if (consersation.getListMessageData().get(position).type.equals("text")){
@@ -760,9 +768,11 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 ((ItemMessageUserHolder) holder).imgImageUser.setVisibility(View.VISIBLE);
                 Picasso.get()
                         .load(consersation.getListMessageData().get(position).text)
-//                        .networkPolicy(NetworkPolicy.NO_CACHE)
-//                        .memoryPolicy(MemoryPolicy.NO_CACHE)
                         .into(((ItemMessageUserHolder) holder).imgMessageUser);
+            }else if (consersation.getListMessageData().get(position).type.equals("media")){
+                ((ItemMessageUserHolder) holder).txtContent.setVisibility(View.GONE);
+                ((ItemMessageUserHolder) holder).voicePlayerView.setVisibility(View.VISIBLE);
+                ((ItemMessageUserHolder) holder).voicePlayerView.setAudio(consersation.getListMessageData().get(position).text);
             }
         }
     }
@@ -784,6 +794,7 @@ class ItemMessageUserHolder extends RecyclerView.ViewHolder {
     public CardView imgImageUser;
     public ImageView imgMessageUser;
     public ProgressBar progressBar;
+    public VoicePlayerView voicePlayerView;
 
 
     public ItemMessageUserHolder(View itemView) {
@@ -793,6 +804,7 @@ class ItemMessageUserHolder extends RecyclerView.ViewHolder {
         imgImageUser = itemView.findViewById(R.id.imgImageUser);
         imgMessageUser = (ImageView) itemView.findViewById(R.id.imgMessageUser);
         progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
+        voicePlayerView = itemView.findViewById(R.id.voicePlayerView);
     }
 }
 
@@ -802,7 +814,7 @@ class ItemMessageFriendHolder extends RecyclerView.ViewHolder {
     public CardView imgImageFriend;
     public ImageView imgMessageFriend;
     public ProgressBar progressBar;
-
+    public VoicePlayerView voicePlayerView;
 
     public ItemMessageFriendHolder(View itemView) {
         super(itemView);
@@ -811,5 +823,6 @@ class ItemMessageFriendHolder extends RecyclerView.ViewHolder {
         imgImageFriend = itemView.findViewById(R.id.imgImageFriend);
         imgMessageFriend = (ImageView) itemView.findViewById(R.id.imgMessageFriend);
         progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
+        voicePlayerView = itemView.findViewById(R.id.voicePlayerView);
     }
 }
