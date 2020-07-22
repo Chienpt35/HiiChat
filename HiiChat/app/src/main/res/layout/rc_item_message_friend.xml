@@ -28,7 +28,7 @@
         app:playPauseBackgroundColor="#8BC34A"
         app:timingBackgroundColor="#8BC34A"
         app:seekBarProgressColor="#000"
-        app:showShareButton="true"
+        app:showShareButton="false"
         app:shareCornerRadius="100"
         app:playPauseCornerRadius="100"
         app:showTiming="true"
