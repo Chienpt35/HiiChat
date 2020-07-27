@@ -22,6 +22,7 @@ import com.example.hiichat.Fragment.FindFragment;
 import com.example.hiichat.Fragment.FriendsFragment;
 import com.example.hiichat.Fragment.GroupFragment;
 import com.example.hiichat.Fragment.UserProfileFragment;
+import com.example.hiichat.Model.mLocation;
 import com.example.hiichat.Service.ServiceUtils;
 import com.example.hiichat.UI.LoginActivity;
 import com.google.android.gms.common.ConnectionResult;
@@ -32,6 +33,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -50,11 +56,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private BottomNavigationView bottomNavigation;
 
 
+    DatabaseReference mdata ;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mdata = FirebaseDatabase.getInstance().getReference();
 
         floatButton = (FloatingActionButton) findViewById(R.id.fab);
         initBottom();
@@ -109,9 +120,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             if (location != null) {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-                // Hiển thị
-//                tvLocation.setText(latitude + "lat: , long: " + longitude);
-                Toast.makeText(this, "Long: " + longitude + "Lat: " + latitude, Toast.LENGTH_SHORT).show();
+//              
+                mLocation mLocation = new mLocation(longitude, latitude);
+                mdata.child("user/" + user.getUid() + "/location").setValue(mLocation);
+
             } else {
 //                tvLocation.setText("(Không thể hiển thị vị trí)");
                 Toast.makeText(this, "Hay bat dinh vi de tim kiem", Toast.LENGTH_SHORT).show();
@@ -209,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+
         getLocation();
     }
 
