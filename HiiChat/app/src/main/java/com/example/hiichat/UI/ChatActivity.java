@@ -296,14 +296,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         setCountDownTimer();
 
-        //create file micro
-        File outputFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MediaMaster/Dub/");
-        filePathMicro = new File(outputFolder.getAbsolutePath()+"out" + new Date().getTime() + ".3gpp");
 
         imgMicro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                verifyMicroPermissions();
+                //verifyMicroPermissions();
+                requestAudioPermissions();
             }
         });
         imgMicroOn.setOnTouchListener(new View.OnTouchListener() {
@@ -364,6 +362,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void startRecording() {
+        //create file micro
+        File outputFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MediaMaster/Dub/");
+        filePathMicro = new File(outputFolder.getAbsolutePath()+"out" + new Date().getTime() + ".3gpp");
+        Log.e("filePathMicro", filePathMicro.getAbsolutePath());
+        Log.e("outputFolder", outputFolder + "");
         countDownTimer.onTick(60000);
         countDownTimer.start();
         if (recorder == null){
@@ -462,8 +465,38 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             countDownTimer.onTick(60000);
             layoutMicro.setVisibility(View.VISIBLE);
             Toast.makeText(this, "Nhấn giữ để ghi âm, thả để gửi !", Toast.LENGTH_LONG).show();
-        }else {
-            layoutMicro.setVisibility(View.GONE);
+        }
+    }
+
+    private void requestAudioPermissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            //When permission is not granted by user, show them message why this permission is needed.
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.RECORD_AUDIO)) {
+                Toast.makeText(this, "Please grant permissions to record audio", Toast.LENGTH_LONG).show();
+
+                //Give user option to still opt-in the permissions
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.RECORD_AUDIO},
+                        REQUEST_MICROPHONE);
+
+            } else {
+                // Show user dialog to grant permission to record audio
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.RECORD_AUDIO},
+                        REQUEST_MICROPHONE);
+            }
+        }
+        //If permission is granted, then go ahead recording audio
+        else if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.RECORD_AUDIO)
+                == PackageManager.PERMISSION_GRANTED) {
+
+            //Go ahead with recording audio now
+            showOrHideViewMicro();
         }
     }
 
@@ -669,16 +702,28 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this, "Bạn cần cấp quyền truy cập máy ảnh cho ứng dụng !!!", Toast.LENGTH_SHORT).show();
                 }
                 break;
-            case REQUEST_MICROPHONE:
+//            case REQUEST_MICROPHONE:
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    // permission was granted
+//                    //gọi hàm hiển thị view micro
+//                    showOrHideViewMicro();
+//                }else {
+//                    Toast.makeText(this, "Bạn cần cấp quyền truy cập micro cho ứng dụng !!!", Toast.LENGTH_SHORT).show();
+//                }
+//                break;
+            case REQUEST_MICROPHONE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted
-                    //gọi hàm hiển thị view micro
+                    // permission was granted, yay!
                     showOrHideViewMicro();
-                }else {
-                    Toast.makeText(this, "Bạn cần cấp quyền truy cập micro cho ứng dụng !!!", Toast.LENGTH_SHORT).show();
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(this, "Permissions Denied to record audio", Toast.LENGTH_LONG).show();
                 }
-                break;
+                return;
+            }
         }
     }
 }
