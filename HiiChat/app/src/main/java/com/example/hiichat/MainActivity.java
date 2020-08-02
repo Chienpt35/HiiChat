@@ -21,6 +21,7 @@ import com.example.hiichat.Data.StaticConfig;
 import com.example.hiichat.Fragment.FindFragment;
 import com.example.hiichat.Fragment.FriendsFragment;
 import com.example.hiichat.Fragment.GroupFragment;
+import com.example.hiichat.Fragment.NotificationFragment;
 import com.example.hiichat.Fragment.UserProfileFragment;
 import com.example.hiichat.Model.mLocation;
 import com.example.hiichat.Service.ServiceUtils;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         final FriendsFragment friendsFragment = new FriendsFragment();
         final GroupFragment groupFragment = new GroupFragment();
         final UserProfileFragment userProfileFragment = new UserProfileFragment();
+        final NotificationFragment notificationFragment = new NotificationFragment();
 
 
         bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -103,6 +105,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         return true;
                     case R.id.inFo:
                         getSupportFragmentManager().beginTransaction().replace(R.id.content_main, userProfileFragment).commit();
+                        return true;
+                    case R.id.notification:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, notificationFragment).commit();
                         return true;
                 }
                 return true;

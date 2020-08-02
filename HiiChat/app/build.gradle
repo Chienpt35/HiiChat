@@ -54,5 +54,4 @@ dependencies {
     implementation 'com.github.JagarYousef:ChatVoicePlayer:1.0.7'
     implementation 'it.sephiroth.android.library.rangeseekbar:rangeseekbar:1.1.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
-
 }
