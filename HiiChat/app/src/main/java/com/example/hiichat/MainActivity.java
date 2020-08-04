@@ -23,6 +23,7 @@ import com.example.hiichat.Fragment.FriendsFragment;
 import com.example.hiichat.Fragment.GroupFragment;
 import com.example.hiichat.Fragment.NotificationFragment;
 import com.example.hiichat.Fragment.UserProfileFragment;
+import com.example.hiichat.Model.User;
 import com.example.hiichat.Model.mLocation;
 import com.example.hiichat.Service.ServiceUtils;
 import com.example.hiichat.UI.LoginActivity;
@@ -38,7 +39,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -66,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mdata = FirebaseDatabase.getInstance().getReference();
+        mdata = FirebaseDatabase.getInstance().getReference().child("user").child(StaticConfig.UID);
 
         floatButton = (FloatingActionButton) findViewById(R.id.fab);
         initBottom();
@@ -125,12 +128,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             if (location != null) {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-//              
-                mLocation mLocation = new mLocation(longitude, latitude);
-                mdata.child("user/" + user.getUid() + "/location").setValue(mLocation);
-
+                mdata.child("latitude").setValue(latitude);
+                mdata.child("longitude").setValue(longitude);
             } else {
-//                tvLocation.setText("(Không thể hiển thị vị trí)");
                 Toast.makeText(this, "Hay bat dinh vi de tim kiem", Toast.LENGTH_SHORT).show();
             }
         }
