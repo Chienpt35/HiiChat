@@ -14,12 +14,13 @@
         android:layout_below="@+id/include">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycleListGroup"
+            android:id="@+id/recycleListFriend"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="15dp" />
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
