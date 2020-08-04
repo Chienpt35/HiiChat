@@ -866,35 +866,39 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (holder instanceof ItemMessageFriendHolder) {
             if (consersation.getListMessageData().get(position).type.equals("text")) {
                 ((ItemMessageFriendHolder) holder).txtContent.setText(consersation.getListMessageData().get(position).text);
-                Bitmap currentAvata = bitmapAvata.get(consersation.getListMessageData().get(position).idSender);
-                if (currentAvata != null) {
-                    ((ItemMessageFriendHolder) holder).avata.setImageBitmap(currentAvata);
-                } else {
-                    final String id = consersation.getListMessageData().get(position).idSender;
-                    if (bitmapAvataDB.get(id) == null) {
-                        bitmapAvataDB.put(id, FirebaseDatabase.getInstance().getReference().child("user/" + id + "/avata"));
-                        bitmapAvataDB.get(id).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.getValue() != null) {
-                                    String avataStr = (String) dataSnapshot.getValue();
-                                    if (!avataStr.equals(StaticConfig.STR_DEFAULT_BASE64)) {
-                                        byte[] decodedString = Base64.decode(avataStr, Base64.DEFAULT);
-                                        ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
-                                    } else {
-                                        ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
+                    try{
+                        Bitmap currentAvata = bitmapAvata.get(consersation.getListMessageData().get(position).idSender);
+                        if (currentAvata != null) {
+                            ((ItemMessageFriendHolder) holder).avata.setImageBitmap(currentAvata);
+                        } else {
+                            final String id = consersation.getListMessageData().get(position).idSender;
+                            if (bitmapAvataDB.get(id) == null) {
+                                bitmapAvataDB.put(id, FirebaseDatabase.getInstance().getReference().child("user/" + id + "/avata"));
+                                bitmapAvataDB.get(id).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.getValue() != null) {
+                                            String avataStr = (String) dataSnapshot.getValue();
+                                            if (!avataStr.equals(StaticConfig.STR_DEFAULT_BASE64)) {
+                                                byte[] decodedString = Base64.decode(avataStr, Base64.DEFAULT);
+                                                ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+                                            } else {
+                                                ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
+                                            }
+                                            notifyDataSetChanged();
+                                        }
                                     }
-                                    notifyDataSetChanged();
-                                }
-                            }
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
 
+                                    }
+                                });
                             }
-                        });
+                        }
+                    }catch (Exception e){
+
                     }
-                }
             } else if (consersation.getListMessageData().get(position).type.equals("image")) {
                 ((ItemMessageFriendHolder) holder).txtContent.setVisibility(View.GONE);
                 ((ItemMessageFriendHolder) holder).imgImageFriend.setVisibility(View.VISIBLE);
