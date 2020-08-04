@@ -16,6 +16,11 @@
         android:icon="@drawable/find_friend"
         android:title="@string/findFriend"/>
     <item
+        android:id="@+id/notification"
+        android:enabled="true"
+        android:icon="@drawable/notification"
+        android:title="@string/notification"/>
+    <item
         android:id="@+id/inFo"
         android:enabled="true"
         android:icon="@drawable/ic_tab_infor"

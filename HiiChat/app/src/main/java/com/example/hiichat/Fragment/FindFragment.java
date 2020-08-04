@@ -78,26 +78,20 @@ public class FindFragment extends Fragment {
     public void getListFriend(){
         arr = new ArrayList<>();
 
-        db.addValueEventListener(new ValueEventListener() {
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot item : dataSnapshot.getChildren()){
-
                     User user = item.getValue(User.class);
-                    Log.e(TAG, "onDataChange: "  );
-
+                    arr.add(user);
                 }
+                Log.e(TAG, "onDataChange: " + arr.get(0));
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(getActivity(), "Error" + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-
-
-
     }
     private void initView(View view) {
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
@@ -126,6 +120,7 @@ public class FindFragment extends Fragment {
         RangeSeekBar rangeSeekBarPossition;
         Button btnHuy;
         Button btnFind;
+
         spinnerGioiTinh = (Spinner) view.findViewById(R.id.spinnerGioiTinh);
         tvtOldBegin = (TextView) view.findViewById(R.id.tvt_oldBegin);
         tvtOldEnd = (TextView) view.findViewById(R.id.tvt_oldEnd);
@@ -174,7 +169,7 @@ public class FindFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+               
             }
         });
     }
