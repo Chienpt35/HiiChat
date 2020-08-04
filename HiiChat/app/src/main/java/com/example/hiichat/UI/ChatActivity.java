@@ -56,12 +56,24 @@ import com.example.hiichat.Data.SharedPreferenceHelper;
 import com.example.hiichat.Data.StaticConfig;
 import com.example.hiichat.Model.Consersation;
 import com.example.hiichat.Model.Message;
+import com.example.hiichat.Model.User;
+import com.example.hiichat.Notification.Client;
+import com.example.hiichat.Notification.Data;
+import com.example.hiichat.Notification.FCMModel;
+import com.example.hiichat.Notification.FCMSubSend;
+import com.example.hiichat.Notification.MyResponse;
+import com.example.hiichat.Notification.Sender;
+import com.example.hiichat.Notification.Token;
 import com.example.hiichat.R;
+import com.example.hiichat.Service.APIService;
+import com.example.hiichat.util.TypeNotification;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -69,11 +81,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Callback;
+import com.google.gson.Gson;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -91,6 +105,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
 import me.jagar.chatvoiceplayerlibrary.VoicePlayerView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
@@ -120,7 +137,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private StorageTask uploadTask;
     private ProgressDialog progressDialog;
     private String sub = "", subStart = "", mCurrentPhotoPath = "", microFileName;
-    private  File filePathMicro = null;
+    private File filePathMicro = null;
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1, REQUEST_MICROPHONE = 2;
     private static String[] PERMISSIONS_STORAGE = {
@@ -134,6 +151,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView imgMicroOn;
     private ImageView imgMicroOff;
     private CountDownTimer countDownTimer;
+    private APIService apiService;
+    private boolean notify = false;
 
 
     @Override
@@ -158,6 +177,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         getListMassage();
 
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                updateToken(task.getResult().getToken());
+            }
+        });
+
+        apiService = Client.getRetrofit("https://fcm.googleapis.com/").create(APIService.class);
+    }
+
+    private void updateToken(String token) {
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Tokens");
+        Token token1 = new Token(token);
+        databaseReference.child(firebaseUser.getUid()).setValue(token1);
     }
 
     private void getListMassage() {
@@ -258,14 +291,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 r1.requestLayout();
                 sub = editWriteMessage.getText().toString().trim();
                 subStart = editWriteMessage.getText().toString().trim();
-                Log.e("sub", sub );
+                Log.e("sub", sub);
                 focusText(sub);
             }
         });
     }
-    private void focusText(String sub){
-        if (sub.length() >= 16){
-                editWriteMessage.setText(sub.substring(0,3) + "...");
+
+    private void focusText(String sub) {
+        if (sub.length() >= 16) {
+            editWriteMessage.setText(sub.substring(0, 3) + "...");
         }
     }
 
@@ -314,7 +348,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     stopRecording();
                     Log.e("Recording", " Recording stop...");
                 }
-                return  true;
+                return true;
             }
         });
 
@@ -364,12 +398,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private void startRecording() {
         //create file micro
         File outputFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MediaMaster/Dub/");
-        filePathMicro = new File(outputFolder.getAbsolutePath()+"out" + new Date().getTime() + ".3gpp");
+        filePathMicro = new File(outputFolder.getAbsolutePath() + "out" + new Date().getTime() + ".3gpp");
         Log.e("filePathMicro", filePathMicro.getAbsolutePath());
         Log.e("outputFolder", outputFolder + "");
         countDownTimer.onTick(60000);
         countDownTimer.start();
-        if (recorder == null){
+        if (recorder == null) {
             recorder = new MediaRecorder();
             recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -382,24 +416,25 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 recorder.start();
             } catch (IOException e) {
                 Log.e("LOG_TAG", "prepare() failed" + e.getMessage());
-            }catch (IllegalStateException e){
+            } catch (IllegalStateException e) {
                 e.printStackTrace();
             }
         }
     }
-    private void stopRecording(){
-            layoutMicro.setVisibility(View.GONE);
-            countDownTimer.cancel();
-            try{
-                recorder.stop();
-                recorder.reset();
-                recorder.release();
-            }catch(RuntimeException stopException){
-                //handle cleanup here
-                Log.d("TAG"," message derreure " + stopException.getMessage());
-            }
-            recorder = null;
-            uploadAudio();
+
+    private void stopRecording() {
+        layoutMicro.setVisibility(View.GONE);
+        countDownTimer.cancel();
+        try {
+            recorder.stop();
+            recorder.reset();
+            recorder.release();
+        } catch (RuntimeException stopException) {
+            //handle cleanup here
+            Log.d("TAG", " message derreure " + stopException.getMessage());
+        }
+        recorder = null;
+        uploadAudio();
     }
 
     private void uploadAudio() {
@@ -434,9 +469,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         countDownTimer = new CountDownTimer(60000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                String v = String.format("%02d", millisUntilFinished/60000);
-                int va = (int)( (millisUntilFinished%60000)/1000);
-                tvtTime.setText(v+":"+String.format("%02d",va));
+                String v = String.format("%02d", millisUntilFinished / 60000);
+                int va = (int) ((millisUntilFinished % 60000) / 1000);
+                tvtTime.setText(v + ":" + String.format("%02d", va));
             }
 
             @Override
@@ -446,22 +481,23 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
     }
-    private void verifyMicroPermissions(){
+
+    private void verifyMicroPermissions() {
         if (ContextCompat.checkSelfPermission(ChatActivity.this,
                 Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(ChatActivity.this,
                     new String[]{Manifest.permission.RECORD_AUDIO},
                     REQUEST_MICROPHONE);
-        }else {
+        } else {
             //gọi hàm hiển thị view micro
             showOrHideViewMicro();
         }
     }
 
-    private void showOrHideViewMicro(){
+    private void showOrHideViewMicro() {
         TransitionManager.beginDelayedTransition(layoutMicro);
-        if (layoutMicro.getVisibility() == View.GONE){
+        if (layoutMicro.getVisibility() == View.GONE) {
             countDownTimer.onTick(60000);
             layoutMicro.setVisibility(View.VISIBLE);
             Toast.makeText(this, "Nhấn giữ để ghi âm, thả để gửi !", Toast.LENGTH_LONG).show();
@@ -535,15 +571,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             uploadTask.continueWithTask(new Continuation() {
                 @Override
                 public Object then(@NonNull Task task) throws Exception {
-                   if (!task.isSuccessful()){
-                       throw task.getException();
-                   }
-                   return filePath.getDownloadUrl();
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    return filePath.getDownloadUrl();
                 }
             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                 @Override
                 public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         Uri downloadUrl = (Uri) task.getResult();
                         myUrl = downloadUrl.toString();
 
@@ -561,7 +597,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
-
     }
 
     private File createImageFile() throws IOException {
@@ -569,7 +604,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        Log.e("storageDir", storageDir + "" );
+        Log.e("storageDir", storageDir + "");
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
@@ -657,6 +692,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+        notify = true;
         if (view.getId() == R.id.btnSend) {
             String content = editWriteMessage.getText().toString().trim();
             if (content.length() > 0) {
@@ -668,8 +704,77 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 newMessage1.type = "text";
                 newMessage1.timestamp = System.currentTimeMillis();
                 FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage1);
+
+//                String dataJson = new Gson().toJson(newMessage1);
+//
+//                FCMModel fcmModel = FCMModel.init()
+//                        .setData(dataJson)
+//                        .setTitle("ABCD")
+//                        .setMessage("Tin nhắn mới")
+//                        .setTo(idFriend.get(0).toString())
+//                        .setType(Type.MESSAGE.toString());
+
+                //FCMSubSend.send(fcmModel, ChatActivity.this);
+
+                final String msg = content;
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("user").child(StaticConfig.UID);
+                databaseReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        if (notify) {
+                            sendNotification(idFriend.get(0).toString(), user.name, msg);
+                        }
+                        notify = false;
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
         }
+    }
+
+    private void sendNotification(String receiver, String username, String message) {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference().child("Tokens");
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                    Token token = dataSnapshot1.getValue(Token.class);
+                    Data data = new Data(StaticConfig.UID, R.drawable.iconfinder_message, username + ": " + message, "Tin nhắn mới !!!",
+                            receiver, username, roomId, TypeNotification.MESSAGE);
+                    Sender sender = new Sender(data, token.getToken());
+
+
+                    apiService.sendNotification(sender).enqueue(new Callback<MyResponse>() {
+                        @Override
+                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                            if (response.code() == 200) {
+                                if (response.body().success != 1) {
+                                    Toast.makeText(ChatActivity.this, "Failed !!!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                        }
+                    });
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void verifyStoragePermissions() {
@@ -683,7 +788,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     PERMISSIONS_STORAGE,
                     REQUEST_EXTERNAL_STORAGE
             );
-        }else{
+        } else {
             // we already have permission, lets go ahead and call camera intent
             dispatchTakePictureIntent();
         }
@@ -691,14 +796,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
+        switch (requestCode) {
             case REQUEST_EXTERNAL_STORAGE:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted
                     dispatchTakePictureIntent();
-                }else {
+                } else {
                     Toast.makeText(this, "Bạn cần cấp quyền truy cập máy ảnh cho ứng dụng !!!", Toast.LENGTH_SHORT).show();
                 }
                 break;
@@ -779,7 +884,7 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                     } else {
                                         ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
                                     }
-                                        notifyDataSetChanged();
+                                    notifyDataSetChanged();
                                 }
                             }
 
@@ -790,31 +895,30 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         });
                     }
                 }
-            }else if (consersation.getListMessageData().get(position).type.equals("image")){
+            } else if (consersation.getListMessageData().get(position).type.equals("image")) {
                 ((ItemMessageFriendHolder) holder).txtContent.setVisibility(View.GONE);
                 ((ItemMessageFriendHolder) holder).imgImageFriend.setVisibility(View.VISIBLE);
                 Picasso.get()
                         .load(consersation.getListMessageData().get(position).text)
                         .into(((ItemMessageFriendHolder) holder).imgMessageFriend);
-            }
-            else if (consersation.getListMessageData().get(position).type.equals("media")){
+            } else if (consersation.getListMessageData().get(position).type.equals("media")) {
                 ((ItemMessageFriendHolder) holder).txtContent.setVisibility(View.GONE);
                 ((ItemMessageFriendHolder) holder).voicePlayerView.setVisibility(View.VISIBLE);
                 ((ItemMessageFriendHolder) holder).voicePlayerView.setAudio(consersation.getListMessageData().get(position).text);
             }
         } else if (holder instanceof ItemMessageUserHolder) {
-            if (consersation.getListMessageData().get(position).type.equals("text")){
+            if (consersation.getListMessageData().get(position).type.equals("text")) {
                 ((ItemMessageUserHolder) holder).txtContent.setText(consersation.getListMessageData().get(position).text);
                 if (bitmapAvataUser != null) {
                     ((ItemMessageUserHolder) holder).avata.setImageBitmap(bitmapAvataUser);
                 }
-            }else if (consersation.getListMessageData().get(position).type.equals("image")){
+            } else if (consersation.getListMessageData().get(position).type.equals("image")) {
                 ((ItemMessageUserHolder) holder).txtContent.setVisibility(View.GONE);
                 ((ItemMessageUserHolder) holder).imgImageUser.setVisibility(View.VISIBLE);
                 Picasso.get()
                         .load(consersation.getListMessageData().get(position).text)
                         .into(((ItemMessageUserHolder) holder).imgMessageUser);
-            }else if (consersation.getListMessageData().get(position).type.equals("media")){
+            } else if (consersation.getListMessageData().get(position).type.equals("media")) {
                 ((ItemMessageUserHolder) holder).txtContent.setVisibility(View.GONE);
                 ((ItemMessageUserHolder) holder).voicePlayerView.setVisibility(View.VISIBLE);
                 ((ItemMessageUserHolder) holder).voicePlayerView.setAudio(consersation.getListMessageData().get(position).text);
