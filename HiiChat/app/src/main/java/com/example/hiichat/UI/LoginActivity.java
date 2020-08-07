@@ -52,7 +52,6 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseUser user;
-    private boolean checkEnterInfo;
     private DatabaseReference userDB;
 
     @Override
@@ -348,6 +347,7 @@ public class LoginActivity extends AppCompatActivity {
             newUser.email = user.getEmail();
             newUser.name = user.getEmail().substring(0, user.getEmail().indexOf("@"));
             newUser.avata = StaticConfig.STR_DEFAULT_BASE64;
+            newUser.id = mAuth.getUid();
             FirebaseDatabase.getInstance().getReference().child("user/" + user.getUid()).setValue(newUser);
         }
     }

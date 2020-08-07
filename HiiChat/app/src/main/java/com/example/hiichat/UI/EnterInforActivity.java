@@ -44,6 +44,7 @@ public class EnterInforActivity extends AppCompatActivity {
     private ImageView imgAvatar;
     private EditText edtGioiTinh;
     private EditText edtTuoi;
+    private EditText edt_name;
     private Button btnNext;
     private static final int PICK_IMAGE = 1997;
     private User myAccount;
@@ -51,10 +52,7 @@ public class EnterInforActivity extends AppCompatActivity {
     private DatabaseReference userDB;
     private TextInputLayout tipGioiTinh;
     private TextInputLayout tipTuoi;
-    public boolean finish;
-
-
-
+    private TextInputLayout tip_name;
 
 
 
@@ -70,10 +68,12 @@ public class EnterInforActivity extends AppCompatActivity {
         imgAvatar = (ImageView) findViewById(R.id.img_avatar);
         edtGioiTinh = (EditText) findViewById(R.id.edt_gioiTinh);
         edtTuoi = (EditText) findViewById(R.id.edt_tuoi);
+        edt_name = (EditText) findViewById(R.id.edt_name);
         btnNext = (Button) findViewById(R.id.btnNext);
         waitingDialog = new LovelyProgressDialog(this);
         tipGioiTinh = (TextInputLayout) findViewById(R.id.tipGioiTinh);
         tipTuoi = (TextInputLayout) findViewById(R.id.tipTuoi);
+        tip_name = (TextInputLayout) findViewById(R.id.tip_name);
         myAccount = new User();
 
         btnNext.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +94,7 @@ public class EnterInforActivity extends AppCompatActivity {
     private void saveUserFirebase() {
         final String gioiTinh = edtGioiTinh.getText().toString().trim();
         final String tuoi = edtTuoi.getText().toString().trim();
+        final String name = edt_name.getText().toString().trim();
 
         if (gioiTinh.isEmpty()){
             tipGioiTinh.setError("Không được để trống !!!");
@@ -105,21 +106,47 @@ public class EnterInforActivity extends AppCompatActivity {
         }else {
             tipTuoi.setError("");
         }
+        if (name.isEmpty()){
+            tip_name.setError("Không được để trống !!!");
+        }else {
+            tip_name.setError("");
+        }
 
 
 
-        if (!gioiTinh.isEmpty() && !tuoi.isEmpty()){
+        if (!gioiTinh.isEmpty() && !tuoi.isEmpty() && !name.isEmpty()){
             waitingDialog.setCancelable(false)
                     .setTitle("Loading....")
                     .setTopColorRes(R.color.colorView)
                     .show();
+
+            userDB.child("name").setValue(name)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+                                myAccount.name = name;
+                            }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d("Update Users", "failed");
+                            waitingDialog.dismiss();
+                            new LovelyInfoDialog(EnterInforActivity.this)
+                                    .setTopColorRes(R.color.colorView)
+                                    .setTitle("False")
+                                    .setMessage("False to update gioiTinh")
+                                    .show();
+                        }
+                    });
 
             userDB.child("gioiTinh").setValue(gioiTinh)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
-                                finish = true;
                                 myAccount.gioiTinh = gioiTinh;
                             }
                         }
@@ -142,7 +169,6 @@ public class EnterInforActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
-                                finish = true;
                                 myAccount.tuoi = tuoi;
                             }
                         }

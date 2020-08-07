@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hiichat.Adapter.MyArrayAdapter;
-import com.example.hiichat.Data.StaticConfig;
 import com.example.hiichat.Model.Type;
 import com.example.hiichat.Model.User;
 import com.example.hiichat.R;
@@ -32,7 +31,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import it.sephiroth.android.library.rangeseekbar.RangeSeekBar;
@@ -67,7 +65,7 @@ public class FindFragment extends Fragment {
         db = FirebaseDatabase.getInstance().getReference().child("user");
 
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_friends, container, false);
+        View view = inflater.inflate(R.layout.fragment_find_friend, container, false);
         builderAlertDialog();
         initView(view);
         getListFriend();
@@ -81,10 +79,13 @@ public class FindFragment extends Fragment {
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 for (DataSnapshot item : dataSnapshot.getChildren()){
                     User user = item.getValue(User.class);
                     arr.add(user);
                 }
+
+
                 Log.e(TAG, "onDataChange: " + arr.get(0));
             }
             @Override

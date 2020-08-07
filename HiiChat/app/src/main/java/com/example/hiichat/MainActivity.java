@@ -25,6 +25,7 @@ import com.example.hiichat.Fragment.NotificationFragment;
 import com.example.hiichat.Fragment.UserProfileFragment;
 import com.example.hiichat.Model.User;
 import com.example.hiichat.Model.mLocation;
+import com.example.hiichat.Notification.Token;
 import com.example.hiichat.Service.ServiceUtils;
 import com.example.hiichat.UI.LoginActivity;
 import com.google.android.gms.common.ConnectionResult;
@@ -37,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,20 +48,14 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
     private static String TAG = "MainActivity";
-
     private Location location ;
     private GoogleApiClient gac ;
-
-
-
     private FloatingActionButton floatButton;
     private ViewPagerAdapter adapter;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseUser user;
     private BottomNavigationView bottomNavigation;
-
-
     DatabaseReference mdata ;
 
 
@@ -77,6 +73,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if(checkPlayServices()){
             buildGoogleApiClient();
         }
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                updateToken(task.getResult().getToken());
+            }
+        });
+
+    }
+
+    public void setSelectedFindFragment(){
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new FindFragment()).commit();
+    }
+
+    private void updateToken(String token) {
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Tokens");
+        Token token1 = new Token(token);
+        databaseReference.child(firebaseUser.getUid()).setValue(token1);
     }
 
     public void initBottom() {
@@ -93,28 +106,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         final NotificationFragment notificationFragment = new NotificationFragment();
 
 
-        bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.friend:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, friendsFragment).commit();
-                        return true;
-                    case R.id.group:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, groupFragment).commit();
-                        return true;
-                    case R.id.findFriend:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, findFragment).commit();
-                        return true;
-                    case R.id.inFo:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, userProfileFragment).commit();
-                        return true;
-                    case R.id.notification:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, notificationFragment).commit();
-                        return true;
-                }
-                return true;
+        bottomNavigation.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()){
+                case R.id.friend:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content_main, friendsFragment).commit();
+                    return true;
+                case R.id.group:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content_main, groupFragment).commit();
+                    return true;
+                case R.id.findFriend:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content_main, findFragment).commit();
+                    return true;
+                case R.id.inFo:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content_main, userProfileFragment).commit();
+                    return true;
+                case R.id.notification:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content_main, notificationFragment).commit();
+                    return true;
             }
+            return true;
         });
     }
 

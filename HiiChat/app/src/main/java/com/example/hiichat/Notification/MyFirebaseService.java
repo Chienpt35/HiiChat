@@ -1,6 +1,7 @@
 package com.example.hiichat.Notification;
 
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -65,6 +66,16 @@ public class MyFirebaseService extends FirebaseMessagingService {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (type.equals("MESSAGE")){
+            if (firebaseUser != null && sented.equals(firebaseUser.getUid())){
+                if (!StaticConfig.UID.equals(remoteMessage.getData().get("user"))){
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                        sendOAndAboveNotification(remoteMessage);
+                    }else {
+                        sendNotification(remoteMessage);
+                    }
+                }
+            }
+        }else if (type.equals("ADDFRIEND")){
             if (firebaseUser != null && sented.equals(firebaseUser.getUid())){
                 if (!StaticConfig.UID.equals(remoteMessage.getData().get("user"))){
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){

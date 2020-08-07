@@ -177,25 +177,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         getListMassage();
 
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                updateToken(task.getResult().getToken());
-            }
-        });
-
         apiService = Client.getRetrofit("https://fcm.googleapis.com/").create(APIService.class);
-    }
-
-    private void updateToken(String token) {
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Tokens");
-        Token token1 = new Token(token);
-        databaseReference.child(firebaseUser.getUid()).setValue(token1);
     }
 
     private void getListMassage() {
         if (idFriend != null && nameFriend != null && toolbar != null) {
-            toolbar.setTitleMarginStart(130);
             toolbar.setTitle(nameFriend);
             toolbar.setTitleTextColor(getResources().getColor(R.color.colorIndivateTab));
             linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -244,22 +230,19 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void animatorEditText() {
-        editWriteMessage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    TransitionManager.beginDelayedTransition(r1);
-                    TransitionManager.beginDelayedTransition(linearLayout2);
-                    TransitionManager.beginDelayedTransition(linearlayout3);
-                    editWriteMessage.setHint("Nhập tin nhắn...");
-                    linearlayout3.setVisibility(View.GONE);
-                    linearLayout2.setVisibility(View.VISIBLE);
-                    r1.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
-                    r1.requestLayout();
-                    subStart = editWriteMessage.getText().toString().trim();
-                    editWriteMessage.setText(subStart);
-                    editWriteMessage.setSelection(editWriteMessage.getText().length());
-                }
+        editWriteMessage.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                TransitionManager.beginDelayedTransition(r1);
+                TransitionManager.beginDelayedTransition(linearLayout2);
+                TransitionManager.beginDelayedTransition(linearlayout3);
+                editWriteMessage.setHint("Nhập tin nhắn...");
+                linearlayout3.setVisibility(View.GONE);
+                linearLayout2.setVisibility(View.VISIBLE);
+                r1.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
+                r1.requestLayout();
+                subStart = editWriteMessage.getText().toString().trim();
+                editWriteMessage.setText(subStart);
+                editWriteMessage.setSelection(editWriteMessage.getText().length());
             }
         });
         editWriteMessage.setOnClickListener(new View.OnClickListener() {
@@ -568,30 +551,42 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             final StorageReference filePath = storageReference.child(StaticConfig.UID + System.currentTimeMillis() + "." + "jpg");
 
             uploadTask = filePath.putFile(fileUri);
-            uploadTask.continueWithTask(new Continuation() {
-                @Override
-                public Object then(@NonNull Task task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-                    return filePath.getDownloadUrl();
+            uploadTask.continueWithTask((Continuation) task -> {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
                 }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()) {
-                        Uri downloadUrl = (Uri) task.getResult();
-                        myUrl = downloadUrl.toString();
+                return filePath.getDownloadUrl();
+            }).addOnCompleteListener((OnCompleteListener<Uri>) task -> {
+                if (task.isSuccessful()) {
+                    Uri downloadUrl = (Uri) task.getResult();
+                    myUrl = downloadUrl.toString();
 
-                        Message newMessage2 = new Message();
-                        newMessage2.text = myUrl;
-                        newMessage2.idSender = StaticConfig.UID;
-                        newMessage2.idReceiver = roomId;
-                        newMessage2.type = "image";
-                        newMessage2.timestamp = System.currentTimeMillis();
-                        FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage2);
-                        progressDialog.dismiss();
-                    }
+                    Message newMessage2 = new Message();
+                    newMessage2.text = myUrl;
+                    newMessage2.idSender = StaticConfig.UID;
+                    newMessage2.idReceiver = roomId;
+                    newMessage2.type = "image";
+                    newMessage2.timestamp = System.currentTimeMillis();
+                    FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage2);
+                    progressDialog.dismiss();
+
+                    final String msg = "Đã gửi hình ảnh";
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("user").child(StaticConfig.UID);
+                    databaseReference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            User user = dataSnapshot.getValue(User.class);
+                            if (notify) {
+                                sendNotification(idFriend.get(0).toString(), user.name, msg, "Tin nhắn mới !!!");
+                            }
+                            notify = false;
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             });
         }
@@ -646,20 +641,35 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         storageTask.addOnCompleteListener(new OnCompleteListener() {
             @Override
             public void onComplete(@NonNull Task task) {
-                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        String myUrl1 = uri.toString();
+                storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                    String myUrl1 = uri.toString();
 
-                        Message newMessage3 = new Message();
-                        newMessage3.text = myUrl1;
-                        newMessage3.idSender = StaticConfig.UID;
-                        newMessage3.idReceiver = roomId;
-                        newMessage3.type = "image";
-                        newMessage3.timestamp = System.currentTimeMillis();
-                        FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage3);
-                        progressDialog.dismiss();
-                    }
+                    Message newMessage3 = new Message();
+                    newMessage3.text = myUrl1;
+                    newMessage3.idSender = StaticConfig.UID;
+                    newMessage3.idReceiver = roomId;
+                    newMessage3.type = "image";
+                    newMessage3.timestamp = System.currentTimeMillis();
+                    FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage3);
+                    progressDialog.dismiss();
+
+                    final String msg = "Đã gửi hình ảnh";
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("user").child(StaticConfig.UID);
+                    databaseReference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            User user = dataSnapshot.getValue(User.class);
+                            if (notify) {
+                                sendNotification(idFriend.get(0).toString(), user.name, msg, "Tin nhắn mới !!!");
+                            }
+                            notify = false;
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 });
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -723,7 +733,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         User user = dataSnapshot.getValue(User.class);
                         if (notify) {
-                            sendNotification(idFriend.get(0).toString(), user.name, msg);
+                            sendNotification(idFriend.get(0).toString(), user.name, msg, "Tin nhắn mới !!!");
                         }
                         notify = false;
                     }
@@ -737,7 +747,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void sendNotification(String receiver, String username, String message) {
+    private void sendNotification(String receiver, String username, String message, String type) {
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference().child("Tokens");
         Query query = tokens.orderByKey().equalTo(receiver);
         query.addValueEventListener(new ValueEventListener() {
@@ -745,7 +755,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     Token token = dataSnapshot1.getValue(Token.class);
-                    Data data = new Data(StaticConfig.UID, R.drawable.iconfinder_message, username + ": " + message, "Tin nhắn mới !!!",
+                    Data data = new Data(StaticConfig.UID, R.drawable.iconfinder_message, username + ": " + message, type,
                             receiver, username, roomId, TypeNotification.MESSAGE);
                     Sender sender = new Sender(data, token.getToken());
 
