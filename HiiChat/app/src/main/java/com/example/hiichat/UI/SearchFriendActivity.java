@@ -14,6 +14,7 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.example.hiichat.Adapter.NotificationAdapter;
 import com.example.hiichat.Adapter.SearchFriendAdapter;
 import com.example.hiichat.Data.SharedPreferenceHelper;
 import com.example.hiichat.Data.StaticConfig;
@@ -37,6 +38,7 @@ public class SearchFriendActivity extends AppCompatActivity {
     private ArrayList<User> list;
     private SearchFriendAdapter adapter;
     private User user;
+    private NotificationAdapter notificationAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +58,7 @@ public class SearchFriendActivity extends AppCompatActivity {
 
         recycleView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         adapter = new SearchFriendAdapter(list, this);
-
+        notificationAdapter = new NotificationAdapter(list, this);
 
         databaseReference = FirebaseDatabase.getInstance().getReference().child("user");
 
@@ -101,12 +103,15 @@ public class SearchFriendActivity extends AppCompatActivity {
 
     private void sortList(String query, ArrayList<User> list) {
         ArrayList<User> users = new ArrayList<>();
-            for (int i = 0; i < list.size(); i++){
-                User user1 = list.get(i);
-                if (user1.email.equals(query)){
-                    users.add(user1);
-                }
+        for (int i = 0; i < list.size(); i++){
+            User user1 = list.get(i);
+            if (user1.email.equals(query)){
+                users.add(user1);
             }
+        }
+
+        checkUser(users);
+
         if (users.size() == 0){
             AlertDialog.Builder builder = new AlertDialog.Builder(this)
                     .setMessage("Không tìm thấy bạn bè, vui lòng thử lại")
@@ -114,8 +119,40 @@ public class SearchFriendActivity extends AppCompatActivity {
                     });
             builder.create().show();
         }
+    }
+
+    private void checkUser(ArrayList<User> users) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Request Friend").child(StaticConfig.UID);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot != null){
+                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                        if (dataSnapshot1.getValue().toString().equals("falsed")){
+                            makeAdapterUser(users);
+                        }else {
+                            makeAdapterFriend(users);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void makeAdapterFriend(ArrayList<User> users) {
         adapter.setList(users);
         adapter.notifyDataSetChanged();
         recycleView.setAdapter(adapter);
+    }
+
+    private void makeAdapterUser(ArrayList<User> users) {
+        notificationAdapter.setList(users);
+        notificationAdapter.notifyDataSetChanged();
+        recycleView.setAdapter(notificationAdapter);
     }
 }

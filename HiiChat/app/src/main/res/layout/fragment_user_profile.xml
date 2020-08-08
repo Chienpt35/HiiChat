@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment.UserProfileFragment">
+    tools:context=".Fragment.UserProfileFragment"
+    android:background="@color/grey_100">
 
     <include layout="@layout/toolbar2" android:id="@+id/include"/>
    <LinearLayout
        android:id="@+id/profile"
-       android:background="@color/grey_100"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:orientation="vertical"
@@ -17,7 +17,7 @@
 
        <ImageView
            android:layout_width="match_parent"
-           android:layout_height="250dp"
+           android:layout_height="218dp"
            android:scaleType="fitStart"
            android:src="@drawable/image_header" />
        <ImageView
@@ -39,10 +39,9 @@
            android:layout_height="wrap_content"/>
    </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_below="@+id/profile"
         android:id="@+id/info_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
-        android:layout_alignParentBottom="true"/>
+        android:layout_below="@+id/profile"/>
 </RelativeLayout>

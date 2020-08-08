@@ -68,35 +68,12 @@ public class NotificationFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot != null){
                     for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                            if (dataSnapshot1.getValue().toString().equals("falsed")){
-                                arrayList.add(dataSnapshot1.getKey());
-                            }
-                            makeListStringKey(arrayList);
-                            progressDialog.dismiss();
-
-//                        DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference()
-//                                .child("Request Friend").child(dataSnapshot1.getKey());
-//                        databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
-//                            @Override
-//                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                Log.e("dataSnapshot", dataSnapshot.getKey());
-//                                if (dataSnapshot != null){
-//                                    if (!StaticConfig.UID.equals(dataSnapshot.getKey())){
-//                                        if (dataSnapshot.getValue().toString().equals("false")){
-//                                            arrayList.add(dataSnapshot.getKey());
-//                                        }
-//                                    }
-//                                    makeListStringKey(arrayList);
-//                                    progressDialog.dismiss();
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                            }
-//                        });
+                        if (dataSnapshot1.getValue().toString().equals("falsed")){
+                            arrayList.add(dataSnapshot1.getKey());
+                        }
                     }
+                    makeListStringKey(arrayList);
+                    progressDialog.dismiss();
                 }
             }
 
