@@ -3,8 +3,8 @@ package com.example.hiichat.Model;
 public class FindFriend {
     public String name_fF;
     public String yearOld_ff;
-    public String sex_ff;
-    public String range_ff;
+    public String gender_ff;
+    public double range_ff;
     public String avatar_ff;
 
     public String getName_fF() {
@@ -23,19 +23,19 @@ public class FindFriend {
         this.yearOld_ff = yearOld_ff;
     }
 
-    public String getSex_ff() {
-        return sex_ff;
+    public String getGender_ff() {
+        return gender_ff;
     }
 
-    public void setSex_ff(String sex_ff) {
-        this.sex_ff = sex_ff;
+    public void setGender_ff(String gender_ff) {
+        this.gender_ff = gender_ff;
     }
 
-    public String getRange_ff() {
+    public double getRange_ff() {
         return range_ff;
     }
 
-    public void setRange_ff(String range_ff) {
+    public void setRange_ff(double range_ff) {
         this.range_ff = range_ff;
     }
 
@@ -47,10 +47,10 @@ public class FindFriend {
         this.avatar_ff = avatar_ff;
     }
 
-    public FindFriend(String name_fF, String yearOld_ff, String sex_ff, String range_ff, String avatar_ff) {
+    public FindFriend() {
         this.name_fF = name_fF;
         this.yearOld_ff = yearOld_ff;
-        this.sex_ff = sex_ff;
+        this.gender_ff = gender_ff;
         this.range_ff = range_ff;
         this.avatar_ff = avatar_ff;
     }
