@@ -25,7 +25,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.hiichat.Data.FriendDB;
 import com.example.hiichat.Data.GroupDB;
 import com.example.hiichat.Data.StaticConfig;
-import com.example.hiichat.MainActivity;
 import com.example.hiichat.Model.Group;
 import com.example.hiichat.Model.ListFriend;
 import com.example.hiichat.R;

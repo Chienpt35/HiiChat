@@ -20,14 +20,14 @@
            android:layout_height="218dp"
            android:scaleType="fitStart"
            android:src="@drawable/image_header" />
-       <ImageView
+       <de.hdodenhof.circleimageview.CircleImageView
            android:id="@+id/img_avatar"
            android:layout_gravity="center"
-           android:layout_width="104dp"
-           android:layout_height="104dp"
+           android:layout_width="150dp"
+           android:layout_height="150dp"
            android:layout_marginTop="-80dp"
            android:src="@drawable/default_avata"
-           android:background="#00000000"/>
+           />
        <TextView
            android:layout_gravity="center"
            android:textSize="24sp"
