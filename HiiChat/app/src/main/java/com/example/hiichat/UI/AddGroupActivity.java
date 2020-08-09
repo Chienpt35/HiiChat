@@ -322,21 +322,18 @@ class ListPeopleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }else{
             ((ItemFriendHolder) holder).avata.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
         }
-        ((ItemFriendHolder) holder).checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    listIDChoose.add(id);
-                    listIDRemove.remove(id);
-                } else {
-                    listIDRemove.add(id);
-                    listIDChoose.remove(id);
-                }
-                if (listIDChoose.size() >= 3) {
-                    btnAddGroup.setBackgroundColor(context.getResources().getColor(R.color.colorView));
-                } else {
-                    btnAddGroup.setBackgroundColor(context.getResources().getColor(R.color.grey_500));
-                }
+        ((ItemFriendHolder) holder).checkBox.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (b) {
+                listIDChoose.add(id);
+                listIDRemove.remove(id);
+            } else {
+                listIDRemove.add(id);
+                listIDChoose.remove(id);
+            }
+            if (listIDChoose.size() >= 1) {
+                btnAddGroup.setBackgroundColor(context.getResources().getColor(R.color.colorView));
+            } else {
+                btnAddGroup.setBackgroundColor(context.getResources().getColor(R.color.grey_400));
             }
         });
         if (isEdit && editGroup.member.contains(id)) {
