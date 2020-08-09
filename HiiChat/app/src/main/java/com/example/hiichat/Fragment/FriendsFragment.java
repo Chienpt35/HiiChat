@@ -253,28 +253,28 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         @Override
         public void onClick(final View view) {
-            new LovelyTextInputDialog(view.getContext(), R.style.EditTextTintTheme)
-                    .setTopColorRes(R.color.colorView)
-                    .setTitle("Add friend")
-                    .setMessage("Enter friend email")
-                    .setIcon(R.drawable.ic_add_friend)
-                    .setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
-                    .setInputFilter("Email not found", text -> {
-                        Pattern VALID_EMAIL_ADDRESS_REGEX =
-                                Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-                        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(text);
-                        return matcher.find();
-                    })
-                    .setConfirmButton(android.R.string.ok, new LovelyTextInputDialog.OnTextInputConfirmListener() {
-                        @Override
-                        public void onTextInputConfirmed(String text) {
-                            //Tim id user id
-                            findIDEmail(text);
-                            //Check xem da ton tai ban ghi friend chua
-                            //Ghi them 1 ban ghi
-                        }
-                    })
-                    .show();
+//            new LovelyTextInputDialog(view.getContext(), R.style.EditTextTintTheme)
+//                    .setTopColorRes(R.color.colorView)
+//                    .setTitle("Add friend")
+//                    .setMessage("Enter friend email")
+//                    .setIcon(R.drawable.ic_add_friend)
+//                    .setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
+//                    .setInputFilter("Email not found", text -> {
+//                        Pattern VALID_EMAIL_ADDRESS_REGEX =
+//                                Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+//                        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(text);
+//                        return matcher.find();
+//                    })
+//                    .setConfirmButton(android.R.string.ok, new LovelyTextInputDialog.OnTextInputConfirmListener() {
+//                        @Override
+//                        public void onTextInputConfirmed(String text) {
+//                            //Tim id user id
+//                            findIDEmail(text);
+//                            //Check xem da ton tai ban ghi friend chua
+//                            //Ghi them 1 ban ghi
+//                        }
+//                    })
+//                    .show();
         }
 
         /**
@@ -531,16 +531,29 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (listFriend.getListFriend().get(position).message.text.length() > 0) {
             ((ItemFriendViewHolder) holder).txtMessage.setVisibility(View.VISIBLE);
             ((ItemFriendViewHolder) holder).txtTime.setVisibility(View.VISIBLE);
+            String message;
             if (!listFriend.getListFriend().get(position).message.text.startsWith(id)) {
-                ((ItemFriendViewHolder) holder).txtMessage.setText(listFriend.getListFriend().get(position).message.text);
-                Log.e("message1", listFriend.getListFriend().get(position).message.text);
-                ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
-                ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
+                message = listFriend.getListFriend().get(position).message.text;
+                if (message.startsWith("https://firebasestorage.googleapis.com/")){
+                    ((ItemFriendViewHolder) holder).txtMessage.setText("Đã gửi 1 ảnh !!!");
+                    ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
+                    ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
+                }else {
+                    ((ItemFriendViewHolder) holder).txtMessage.setText(listFriend.getListFriend().get(position).message.text);
+                    ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
+                    ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
+                }
             } else {
-                ((ItemFriendViewHolder) holder).txtMessage.setText(listFriend.getListFriend().get(position).message.text.substring((id + "").length()));
-                Log.e("message2", listFriend.getListFriend().get(position).message.text.substring((id + "").length()));
-                ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT_BOLD);
-                ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT_BOLD);
+                message = listFriend.getListFriend().get(position).message.text.substring((id + "").length());
+                if (message.startsWith("https://firebasestorage.googleapis.com/")){
+                    ((ItemFriendViewHolder) holder).txtMessage.setText("Đã gửi 1 ảnh !!!");
+                    ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT_BOLD);
+                    ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT_BOLD);
+                }else {
+                    ((ItemFriendViewHolder) holder).txtMessage.setText(listFriend.getListFriend().get(position).message.text.substring((id + "").length()));
+                    ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT_BOLD);
+                    ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT_BOLD);
+                }
             }
             String time = new SimpleDateFormat("EEE, d MMM yyyy").format(new Date(listFriend.getListFriend().get(position).message.timestamp));
             String today = new SimpleDateFormat("EEE, d MMM yyyy").format(new Date(System.currentTimeMillis()));
@@ -722,6 +735,44 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                 }
             });
+            FirebaseDatabase.getInstance().getReference().child("friend").child(idFriend)
+                    .orderByValue().equalTo(StaticConfig.UID).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.getValue() == null) {
+                        //email not found
+                        Log.e("Error", "Error occurred during deleting friend");
+                    } else {
+                        String idRemoval = ((HashMap) dataSnapshot.getValue()).keySet().iterator().next().toString();
+                        FirebaseDatabase.getInstance().getReference().child("friend")
+                                .child(idFriend).child(idRemoval).removeValue()
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        Log.e("Success", "Friend deleting successfully");
+                                        Intent intentDeleted = new Intent(FriendsFragment.ACTION_DELETE_FRIEND);
+                                        intentDeleted.putExtra("idFriend", idFriend);
+                                        context.sendBroadcast(intentDeleted);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.e("Error", "Error occurred during deleting friend");
+                                    }
+                                });
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+            FirebaseDatabase.getInstance().getReference().child("Request Friend").child(StaticConfig.UID)
+                    .child(idFriend).removeValue();
+            FirebaseDatabase.getInstance().getReference().child("Request Friend").child(idFriend)
+                    .child(StaticConfig.UID).removeValue();
         } else {
             dialogWaitDeleting.dismiss();
             new LovelyInfoDialog(context)
