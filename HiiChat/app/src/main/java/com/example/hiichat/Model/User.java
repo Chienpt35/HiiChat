@@ -9,8 +9,8 @@ public class User {
     public String tuoi;
     public Status status;
     public Message message;
-    public Double valueLong;
-    public Double valueLat;
+    public double valueLong;
+    public double valueLat;
 
     public User(Double valueLong, Double valueLat) {
         this.valueLong = valueLong;

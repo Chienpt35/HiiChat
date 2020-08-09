@@ -16,7 +16,8 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="5dp"
-        android:src="@drawable/default_avata"/>
+        android:src="@drawable/default_avata"
+        android:visibility="gone"/>
 
     <me.jagar.chatvoiceplayerlibrary.VoicePlayerView
         android:id="@+id/voicePlayerView"
@@ -49,13 +50,14 @@
         android:id="@+id/textContentUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_alignParentEnd="true"
         android:layout_marginEnd="5dp"
         android:layout_toStartOf="@id/imageView2"
         android:background="@drawable/rounded_corner1"
+        android:backgroundTint="@color/colorMessagerUser"
         android:padding="10dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#000"
+        android:textColor="#FFF"
         android:visibility="visible"/>
 
     <androidx.cardview.widget.CardView

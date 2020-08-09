@@ -118,6 +118,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Tuổi"
+                            android:inputType="number"
                             android:background="@drawable/selector_bg_edit"
                             android:paddingBottom="2dp"
                             android:textColor="@color/colortextEmail"

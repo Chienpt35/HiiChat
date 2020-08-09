@@ -128,7 +128,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private RelativeLayout layoutMicro;
     private TextView tvtTime;
     private ImageView imgMicroOn;
-    private ImageView imgMicroOff;
     private CountDownTimer countDownTimer;
     private APIService apiService;
     private boolean notify = false;
@@ -284,7 +283,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         toolbar = findViewById(R.id.toolbar);
         tvtTime = (TextView) findViewById(R.id.tvt_time);
         imgMicroOn = (ImageView) findViewById(R.id.imgMicroOn);
-        imgMicroOff = (ImageView) findViewById(R.id.imgMicroOff);
         imgCamera = findViewById(R.id.imgCamera);
         imgImage = findViewById(R.id.imgImage);
         imgMicro = findViewById(R.id.imgMicro);
@@ -813,7 +811,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     // functionality that depends on this permission.
                     Toast.makeText(this, "Permissions Denied to record audio", Toast.LENGTH_LONG).show();
                 }
-                return;
+                break;
             }
         }
     }
@@ -899,9 +897,9 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (holder instanceof ItemMessageUserHolder) {
             if (consersation.getListMessageData().get(position).type.equals("text")) {
                 ((ItemMessageUserHolder) holder).txtContent.setText(consersation.getListMessageData().get(position).text);
-                if (bitmapAvataUser != null) {
-                    ((ItemMessageUserHolder) holder).avata.setImageBitmap(bitmapAvataUser);
-                }
+//                if (bitmapAvataUser != null) {
+//                    ((ItemMessageUserHolder) holder).avata.setImageBitmap(bitmapAvataUser);
+//                }
             } else if (consersation.getListMessageData().get(position).type.equals("image")) {
                 ((ItemMessageUserHolder) holder).txtContent.setVisibility(View.GONE);
                 ((ItemMessageUserHolder) holder).imgImageUser.setVisibility(View.VISIBLE);

@@ -126,7 +126,7 @@ public class SearchFriendActivity extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot != null){
+                if (dataSnapshot.getValue() != null){
                     for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                         if (dataSnapshot1.getValue().toString().equals("falsed")){
                             makeAdapterUser(users);
@@ -134,6 +134,8 @@ public class SearchFriendActivity extends AppCompatActivity {
                             makeAdapterFriend(users);
                         }
                     }
+                }else {
+                    makeAdapterFriend(users);
                 }
             }
 

@@ -212,12 +212,7 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         }
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            waitingDialog.dismiss();
-                        }
-                    });
+                    .addOnFailureListener(e -> waitingDialog.dismiss());
         }
 
         void signIn(String email, String pass) {
@@ -279,12 +274,7 @@ public class LoginActivity extends AppCompatActivity {
                             new LovelyInfoDialog(LoginActivity.this) {
                                 @Override
                                 public LovelyInfoDialog setConfirmButtonText(String text) {
-                                    findView(R.id.ld_btn_confirm).setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            dismiss();
-                                        }
-                                    });
+                                    findView(R.id.ld_btn_confirm).setOnClickListener(v -> dismiss());
                                     return super.setConfirmButtonText(text);
                                 }
                             }
@@ -302,12 +292,7 @@ public class LoginActivity extends AppCompatActivity {
                             new LovelyInfoDialog(LoginActivity.this) {
                                 @Override
                                 public LovelyInfoDialog setConfirmButtonText(String text) {
-                                    findView(com.yarolegovich.lovelydialog.R.id.ld_btn_confirm).setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            dismiss();
-                                        }
-                                    });
+                                    findView(com.yarolegovich.lovelydialog.R.id.ld_btn_confirm).setOnClickListener(view -> dismiss());
                                     return super.setConfirmButtonText(text);
                                 }
                             }

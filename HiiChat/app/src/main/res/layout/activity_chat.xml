@@ -42,7 +42,8 @@
                 android:src="@drawable/ic_video_call"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="20dp"/>
+                android:layout_marginRight="20dp"
+                android:visibility="gone"/>
         </RelativeLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -96,13 +97,6 @@
             android:src="@drawable/iconfinder_miccro"
             android:visibility="visible"
             android:background="@drawable/animation_buton"/>
-        <ImageView
-            android:id="@+id/imgMicroOff"
-            android:layout_centerInParent="true"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/iconfinder_mute_mic_microphone"
-            android:visibility="gone" />
     </RelativeLayout>
 
     <View

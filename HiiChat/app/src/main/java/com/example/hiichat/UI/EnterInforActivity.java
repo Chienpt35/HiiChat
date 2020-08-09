@@ -81,19 +81,9 @@ public class EnterInforActivity extends AppCompatActivity {
         setUpSpinner();
         myAccount = new User();
 
-        btnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveUserFirebase();
-            }
-        });
+        btnNext.setOnClickListener(v -> saveUserFirebase());
 
-        imgAvatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onAvatarClick();
-            }
-        });
+        imgAvatar.setOnClickListener(v -> onAvatarClick());
     }
 
     private void setUpSpinner() {

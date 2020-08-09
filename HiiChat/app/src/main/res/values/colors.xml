@@ -18,4 +18,5 @@
     <color name="grey_400">#70A4A4A4</color>
     <color name="grey_100">#F5F5F5</color>
     <color name="grey_800">#212121</color>
+    <color name="colorMessagerUser">#E43167FB</color>
 </resources>
