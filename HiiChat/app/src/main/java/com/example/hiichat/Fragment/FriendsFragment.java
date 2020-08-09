@@ -511,35 +511,24 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         //nhấn giữ để xóa bạn
         ((View) ((ItemFriendViewHolder) holder).txtName.getParent().getParent().getParent())
-                .setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View view) {
-                        String friendName = (String) ((ItemFriendViewHolder) holder).txtName.getText();
+                .setOnLongClickListener(view -> {
+                    String friendName = (String) ((ItemFriendViewHolder) holder).txtName.getText();
 
-                        new AlertDialog.Builder(context)
-                                .setTitle("Delete Friend")
-                                .setMessage("Are you sure want to delete " + friendName + "?")
-                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
-                                        final String idFriendRemoval = listFriend.getListFriend().get(position).id;
-                                        dialogWaitDeleting.setTitle("Deleting...")
-                                                .setCancelable(false)
-                                                .setTopColorRes(R.color.colorAccent)
-                                                .show();
-                                        deleteFriend(idFriendRemoval);
-                                    }
-                                })
-                                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
-                                    }
-                                }).show();
+                    new AlertDialog.Builder(context)
+                            .setTitle("Delete Friend")
+                            .setMessage("Are you sure want to delete " + friendName + "?")
+                            .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                                dialogInterface.dismiss();
+                                final String idFriendRemoval = listFriend.getListFriend().get(position).id;
+                                dialogWaitDeleting.setTitle("Deleting...")
+                                        .setCancelable(false)
+                                        .setTopColorRes(R.color.colorAccent)
+                                        .show();
+                                deleteFriend(idFriendRemoval);
+                            })
+                            .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss()).show();
 
-                        return true;
-                    }
+                    return true;
                 });
 
         if (listFriend.getListFriend().get(position).message.text.length() > 0) {
@@ -613,6 +602,8 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 mapMark.put(id, true);
             }
         }
+
+
         if (listFriend.getListFriend().get(position).avata.equals(StaticConfig.STR_DEFAULT_BASE64)) {
             ((ItemFriendViewHolder) holder).avata.setImageResource(R.drawable.default_avata);
         } else {
