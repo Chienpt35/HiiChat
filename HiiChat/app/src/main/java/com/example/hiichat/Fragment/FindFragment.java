@@ -1,7 +1,6 @@
 package com.example.hiichat.Fragment;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,54 +16,49 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hiichat.Adapter.MyArrayAdapter;
-import com.example.hiichat.Data.FriendDB;
 import com.example.hiichat.Data.SharedPreferenceHelper;
-import com.example.hiichat.Data.StaticConfig;
 import com.example.hiichat.Model.FindFriend;
-import com.example.hiichat.Model.Friend;
-import com.example.hiichat.Model.ListFriend;
 import com.example.hiichat.Model.Type;
 import com.example.hiichat.Model.User;
 import com.example.hiichat.R;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import it.sephiroth.android.library.rangeseekbar.RangeSeekBar;
 
 public class FindFragment extends Fragment {
 
     private SwipeRefreshLayout swipeRefreshLayout;
-    private RecyclerView recycleListFriend;
     private FloatingActionButton fab;
     private DatabaseReference db ;
     private FirebaseUser firebaseUser;
     private double myLat, myLong;
     private static final String TAG = "FindFriend";
-    private FindFriendAdapter findFriendAdapter ;
+//    private FindFriendAdapter findFriendAdapter ;
     LinearLayout linearLayout;
 
+    ListView listView;
     ArrayList<User> arr =  new ArrayList<>();
-
-
+    ArrayList<HashMap<String,String>> arrayList = new ArrayList<HashMap<String, String>>();
 
 
      private FindFriend findFriend = new FindFriend();
@@ -89,37 +83,10 @@ public class FindFragment extends Fragment {
         double kmInDec = Integer.valueOf(newFormat.format(km));
         double meter = valueResult % 1000;
         double meterInDec = Integer.valueOf(newFormat.format(meter));
-        Log.e("Radius Value", "" + valueResult + "   KM  " + kmInDec
-                + " Meter   " + meterInDec + "   " + latitude2 + "    " + longitude2);
-        return meterInDec;
+//        Log.e("Radius Value", "" + valueResult + "   KM  " + kmInDec
+//                + " Meter   " + meterInDec + "   " + latitude2 + "    " + longitude2);
+        return kmInDec;
     }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        db = FirebaseDatabase.getInstance().getReference().child("user");
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_friends, container, false);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-        recycleListFriend = (RecyclerView) view.findViewById(R.id.recycleListFriend);
-        recycleListFriend.setLayoutManager(linearLayoutManager);
-        recycleListFriend.setItemAnimator( new DefaultItemAnimator());
-        recycleListFriend.setAdapter(findFriendAdapter);
-
-        builderAlertDialog();
-        initView(view);
-        getListFriend();
-
-
-
-        return view;
-    }
-
     public void getListFriend(){
 
         db.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -140,19 +107,28 @@ public class FindFragment extends Fragment {
                     }
 
                 }
-                for(int i = 0; i < arr.size();i++){
-                    findFriend.avatar_ff = arr.get(i).avata;
-                    findFriend.name_fF = arr.get(i).name;
-                    findFriend.gender_ff = arr.get(i).gioiTinh;
-                    findFriend.yearOld_ff = arr.get(i).tuoi;
-
+//                for(int i = 0; i < arr.size();i++){
+//                    findFriend.avatar_ff = arr.get(i).avata;
+//                    findFriend.name_fF = arr.get(i).name;
+//                    findFriend.gender_ff = arr.get(i).gioiTinh;
+//                    findFriend.yearOld_ff = arr.get(i).tuoi;
 //                    findFriend.range_ff =  CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude);
-                    Log.e(TAG, "onDataChange: "+ CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude) );
-            }
+//                    Log.e(TAG, "onDataChange: "+ CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude) );
+//            }
+                for (int i=0;i<arr.size();i++)
+                {
+                    double a = CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude);
+                    HashMap<String,String> hashMap=new HashMap<String, String>();//create a hashmap to store the data in key value pair
+                    hashMap.put("avatar",arr.get(i).avata);
+                    hashMap.put("name", arr.get(i).name);
+                    hashMap.put("gender",arr.get(i).gioiTinh);
+                    hashMap.put("yearOld",arr.get(i).tuoi);
+                    hashMap.put("range", Double.toString(a) ) ;
 
+                    arrayList.add(hashMap);//add the hashmap into arrayList
+                }
 
-//                Log.e(TAG, "onDataChange: " + arr );
-
+                Log.e(TAG, "Arr: " + arrayList );
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -160,9 +136,44 @@ public class FindFragment extends Fragment {
             }
         });
     }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        db = FirebaseDatabase.getInstance().getReference().child("user");
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.find_friend_fragment, container, false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+
+        listView = view.findViewById(R.id.ff_listView);
+
+        builderAlertDialog();
+        initView(view);
+        getListFriend();
+
+        Log.e(TAG, "param: " + arrayList );
+
+
+        String[] from={"avatar","name","gender","yearOld","range"};
+        int[] den ={R.id.avatar_find,R.id.tv_nameFind, R.id.tv_genderFind, R.id.tv_ageFind, R.id.tv_rangeFind};
+        SimpleAdapter simpleAdapter = new SimpleAdapter(getContext(), arrayList, R.layout.rc_item_find_friend, from, den);
+
+        listView.setAdapter(simpleAdapter);
+
+
+        return view;
+    }
+
+
     private void initView(View view) {
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -242,62 +253,65 @@ public class FindFragment extends Fragment {
 }
 
 
+//
+//
+//class FindFriendAdapter extends  RecyclerView.Adapter<FindFriendAdapter.MyViewHolder>{
+//
+//    private List<User> arrList ;
+//    private LayoutInflater layoutInflater;
+//    private Context context;
+//
+//    public FindFriendAdapter(List<User> arrList, Context context) {
+//        this.arrList = arrList;
+//        this.context = context;
+//        layoutInflater = LayoutInflater.from(context);
+//
+//    }
+//
+//    public class  MyViewHolder extends RecyclerView.ViewHolder{
+//        public TextView name, gender, age, range;
+//        public ImageView avatar ;
+//
+//        public MyViewHolder(@NonNull View itemView) {
+//            super(itemView);
+//            name = (TextView) itemView.findViewById(R.id.tv_nameFind);
+//            gender = (TextView) itemView.findViewById(R.id.tv_genderFind);
+//            age = (TextView) itemView.findViewById(R.id.tv_ageFind);
+////            range = (TextView) itemView.findViewById(R.id.tv_rangeFind);
+//
+//            avatar = (ImageView) itemView.findViewById(R.id.avatar_find);
+//
+//
+//
+//        }
+//    }
+//
+//
+//    @NonNull
+//    @Override
+//    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+//        View item = layoutInflater.inflate(R.layout.rc_item_find_friend, parent, false);
+//        return new MyViewHolder(item);
+//    }
+//
+//    @Override
+//    public void onBindViewHolder(@NonNull FindFriendAdapter.MyViewHolder holder, int position) {
+//        User user = arrList.get(position);
+//        holder.name.setText(user.getName());
+//        holder.gender.setText(user.getGioiTinh());
+//        holder.age.setText(user.getTuoi());
+////            holder.range.setText(user.get);
+//        holder.avatar.setImageResource(Integer.parseInt(user.avata));
+//
+//    }
+//
+//    @Override
+//    public int getItemCount() {
+//        return arrList.size();
+//    }
+//}
 
-    class FindFriendAdapter extends  RecyclerView.Adapter<FindFriendAdapter.MyViewHolder>{
 
-        private List<User> arrList ;
-        private LayoutInflater layoutInflater;
-        private Context context;
-
-        public FindFriendAdapter(List<User> arrList, Context context) {
-            this.arrList = arrList;
-            this.context = context;
-            layoutInflater = LayoutInflater.from(context);
-
-        }
-
-        public class  MyViewHolder extends RecyclerView.ViewHolder{
-            public TextView name, gender, age, range;
-            public ImageView avatar ;
-
-            public MyViewHolder(@NonNull View itemView) {
-                super(itemView);
-            name = (TextView) itemView.findViewById(R.id.tv_nameFind);
-            gender = (TextView) itemView.findViewById(R.id.tv_genderFind);
-            age = (TextView) itemView.findViewById(R.id.tv_ageFind);
-//            range = (TextView) itemView.findViewById(R.id.tv_rangeFind);
-
-            avatar = (ImageView) itemView.findViewById(R.id.avatar_find);
-
-
-
-            }
-        }
-
-
-        @NonNull
-        @Override
-        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View item = layoutInflater.inflate(R.layout.rc_item_find_friend, parent, false);
-            return new MyViewHolder(item);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull FindFriendAdapter.MyViewHolder holder, int position) {
-            User user = arrList.get(position);
-            holder.name.setText(user.getName());
-            holder.gender.setText(user.getGioiTinh());
-            holder.age.setText(user.getTuoi());
-//            holder.range.setText(user.get);
-            holder.avatar.setImageResource(Integer.parseInt(user.avata));
-
-        }
-
-        @Override
-        public int getItemCount() {
-            return arrList.size();
-        }
-    }
 //class FindFriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 //
 //    private List listFindFriend;

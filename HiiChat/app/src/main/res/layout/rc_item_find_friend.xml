@@ -2,15 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
+    android:layout_height="90dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/avatar_find"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="130dp"
-        android:layout_height="130dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:src="@drawable/btn_add_find"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
@@ -18,7 +18,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="130dp"
+        android:layout_height="70dp"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         android:orientation="vertical"
@@ -72,7 +72,7 @@
                 android:background="@drawable/range_find"/>
             <TextView
                 android:id="@+id/tv_rangeFind"
-                android:layout_width="30dp"
+                android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="5dp"
