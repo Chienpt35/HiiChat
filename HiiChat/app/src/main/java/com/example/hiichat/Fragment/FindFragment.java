@@ -69,7 +69,7 @@ public class FindFragment extends Fragment {
         builderAlertDialog();
         initView(view);
         getListFriend();
-
+        
         return view;
     }
 
@@ -84,7 +84,6 @@ public class FindFragment extends Fragment {
                     User user = item.getValue(User.class);
                     arr.add(user);
                 }
-
 
                 Log.e(TAG, "onDataChange: " + arr.get(0));
             }
