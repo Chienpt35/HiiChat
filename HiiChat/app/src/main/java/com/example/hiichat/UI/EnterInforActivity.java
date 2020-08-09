@@ -13,9 +13,12 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.hiichat.Data.SharedPreferenceHelper;
@@ -39,10 +42,10 @@ import com.yarolegovich.lovelydialog.LovelyProgressDialog;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class EnterInforActivity extends AppCompatActivity {
     private ImageView imgAvatar;
-    private EditText edtGioiTinh;
     private EditText edtTuoi;
     private EditText edt_name;
     private Button btnNext;
@@ -50,10 +53,11 @@ public class EnterInforActivity extends AppCompatActivity {
     private User myAccount;
     private LovelyProgressDialog waitingDialog;
     private DatabaseReference userDB;
-    private TextInputLayout tipGioiTinh;
     private TextInputLayout tipTuoi;
     private TextInputLayout tip_name;
-
+    private Spinner spinnerGioiTinh;
+    private String gioiTinh;
+    private ArrayList<String> stringArrayList;
 
 
     @Override
@@ -66,14 +70,15 @@ public class EnterInforActivity extends AppCompatActivity {
 
     private void initView() {
         imgAvatar = (ImageView) findViewById(R.id.img_avatar);
-        edtGioiTinh = (EditText) findViewById(R.id.edt_gioiTinh);
         edtTuoi = (EditText) findViewById(R.id.edt_tuoi);
         edt_name = (EditText) findViewById(R.id.edt_name);
         btnNext = (Button) findViewById(R.id.btnNext);
         waitingDialog = new LovelyProgressDialog(this);
-        tipGioiTinh = (TextInputLayout) findViewById(R.id.tipGioiTinh);
         tipTuoi = (TextInputLayout) findViewById(R.id.tipTuoi);
         tip_name = (TextInputLayout) findViewById(R.id.tip_name);
+        spinnerGioiTinh = (Spinner) findViewById(R.id.spinnerGioiTinh);
+        stringArrayList = new ArrayList<>();
+        setUpSpinner();
         myAccount = new User();
 
         btnNext.setOnClickListener(new View.OnClickListener() {
@@ -91,16 +96,29 @@ public class EnterInforActivity extends AppCompatActivity {
         });
     }
 
+    private void setUpSpinner() {
+        stringArrayList.add("Nam");
+        stringArrayList.add("Nữ");
+        stringArrayList.add("Khác");
+        ArrayAdapter arrayAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, stringArrayList);
+        spinnerGioiTinh.setAdapter(arrayAdapter);
+        spinnerGioiTinh.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                gioiTinh = stringArrayList.get(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
     private void saveUserFirebase() {
-        final String gioiTinh = edtGioiTinh.getText().toString().trim();
         final String tuoi = edtTuoi.getText().toString().trim();
         final String name = edt_name.getText().toString().trim();
 
-        if (gioiTinh.isEmpty()){
-            tipGioiTinh.setError("Không được để trống !!!");
-        }else {
-            tipGioiTinh.setError("");
-        }
         if (tuoi.isEmpty()){
             tipTuoi.setError("Không được để trống !!!");
         }else {
@@ -114,76 +132,58 @@ public class EnterInforActivity extends AppCompatActivity {
 
 
 
-        if (!gioiTinh.isEmpty() && !tuoi.isEmpty() && !name.isEmpty()){
+        if (!tuoi.isEmpty() && !name.isEmpty()){
             waitingDialog.setCancelable(false)
                     .setTitle("Loading....")
                     .setTopColorRes(R.color.colorView)
                     .show();
 
             userDB.child("name").setValue(name)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if(task.isSuccessful()){
-                                myAccount.name = name;
-                            }
+                    .addOnCompleteListener(task -> {
+                        if(task.isSuccessful()){
+                            myAccount.name = name;
                         }
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("Update Users", "failed");
-                            waitingDialog.dismiss();
-                            new LovelyInfoDialog(EnterInforActivity.this)
-                                    .setTopColorRes(R.color.colorView)
-                                    .setTitle("False")
-                                    .setMessage("False to update gioiTinh")
-                                    .show();
-                        }
+                    .addOnFailureListener(e -> {
+                        Log.d("Update Users", "failed");
+                        waitingDialog.dismiss();
+                        new LovelyInfoDialog(EnterInforActivity.this)
+                                .setTopColorRes(R.color.colorView)
+                                .setTitle("False")
+                                .setMessage("False to update gioiTinh")
+                                .show();
                     });
 
             userDB.child("gioiTinh").setValue(gioiTinh)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if(task.isSuccessful()){
-                                myAccount.gioiTinh = gioiTinh;
-                            }
+                    .addOnCompleteListener(task -> {
+                        if(task.isSuccessful()){
+                            myAccount.gioiTinh = gioiTinh;
                         }
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("Update Users", "failed");
-                            waitingDialog.dismiss();
-                            new LovelyInfoDialog(EnterInforActivity.this)
-                                    .setTopColorRes(R.color.colorView)
-                                    .setTitle("False")
-                                    .setMessage("False to update gioiTinh")
-                                    .show();
-                        }
+                    .addOnFailureListener(e -> {
+                        Log.d("Update Users", "failed");
+                        waitingDialog.dismiss();
+                        new LovelyInfoDialog(EnterInforActivity.this)
+                                .setTopColorRes(R.color.colorView)
+                                .setTitle("False")
+                                .setMessage("False to update gioiTinh")
+                                .show();
                     });
 
             userDB.child("tuoi").setValue(tuoi)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if(task.isSuccessful()){
-                                myAccount.tuoi = tuoi;
-                            }
+                    .addOnCompleteListener(task -> {
+                        if(task.isSuccessful()){
+                            myAccount.tuoi = tuoi;
                         }
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("Update Users", "failed");
-                            waitingDialog.dismiss();
-                            new LovelyInfoDialog(EnterInforActivity.this)
-                                    .setTopColorRes(R.color.colorView)
-                                    .setTitle("False")
-                                    .setMessage("False to update tuoi")
-                                    .show();
-                        }
+                    .addOnFailureListener(e -> {
+                        Log.d("Update Users", "failed");
+                        waitingDialog.dismiss();
+                        new LovelyInfoDialog(EnterInforActivity.this)
+                                .setTopColorRes(R.color.colorView)
+                                .setTitle("False")
+                                .setMessage("False to update tuoi")
+                                .show();
                     });
 
             userDB.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -196,12 +196,9 @@ public class EnterInforActivity extends AppCompatActivity {
                                 .setCancelable(false)
                                 .setTitle("Success")
                                 .setMessage("Update Users successfully!")
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        startActivity(new Intent(EnterInforActivity.this, MainActivity.class));
-                                        EnterInforActivity.this.finish();
-                                    }
+                                .setPositiveButton("OK", (dialog, which) -> {
+                                    startActivity(new Intent(EnterInforActivity.this, MainActivity.class));
+                                    EnterInforActivity.this.finish();
                                 })
                                 .create().show();
                         SharedPreferenceHelper preferenceHelper = SharedPreferenceHelper.getInstance(EnterInforActivity.this);
@@ -224,15 +221,12 @@ public class EnterInforActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Avatar")
                 .setMessage("Are you sure want to change avatar profile?")
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent = new Intent();
-                        intent.setType("image/*");
-                        intent.setAction(Intent.ACTION_PICK);
-                        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
-                        dialogInterface.dismiss();
-                    }
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.setAction(Intent.ACTION_PICK);
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+                    dialogInterface.dismiss();
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
