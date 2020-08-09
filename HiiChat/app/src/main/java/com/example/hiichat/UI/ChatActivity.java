@@ -146,8 +146,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         nameFriend = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND);
 
         String base64AvataUser = SharedPreferenceHelper.getInstance(this).getUserInfo().avata;
-        Log.e("base64AvataUser", base64AvataUser);
-        Log.e("bitmapAvataFriend", bitmapAvataFriend.toString());
         if (!base64AvataUser.equals(StaticConfig.STR_DEFAULT_BASE64)) {
             byte[] decodedString = Base64.decode(base64AvataUser, Base64.DEFAULT);
             bitmapAvataUser = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);

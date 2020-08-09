@@ -485,28 +485,25 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         final String avata = listFriend.getListFriend().get(position).avata;
         ((ItemFriendViewHolder) holder).txtName.setText(name);
         ((View) ((ItemFriendViewHolder) holder).txtName.getParent().getParent().getParent())
-                .setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
-                        ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
-                        Intent intent = new Intent(context, ChatActivity.class);
-                        intent.putExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND, name);
-                        ArrayList<CharSequence> idFriend = new ArrayList<CharSequence>();
-                        idFriend.add(id);
-                        intent.putCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID, idFriend);
-                        intent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, idRoom);
-                        ChatActivity.bitmapAvataFriend = new HashMap<>();
-                        if (!avata.equals(StaticConfig.STR_DEFAULT_BASE64)) {
-                            byte[] decodedString = Base64.decode(avata, Base64.DEFAULT);
-                            ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
-                        } else {
-                            ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
-                        }
-
-                        mapMark.put(id, null);
-                        fragment.startActivityForResult(intent, FriendsFragment.ACTION_START_CHAT);
+                .setOnClickListener(view -> {
+                    ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
+                    ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
+                    Intent intent = new Intent(context, ChatActivity.class);
+                    intent.putExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND, name);
+                    ArrayList<CharSequence> idFriend = new ArrayList<CharSequence>();
+                    idFriend.add(id);
+                    intent.putCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID, idFriend);
+                    intent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, idRoom);
+                    ChatActivity.bitmapAvataFriend = new HashMap<>();
+                    if (!avata.equals(StaticConfig.STR_DEFAULT_BASE64)) {
+                        byte[] decodedString = Base64.decode(avata, Base64.DEFAULT);
+                        ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+                    } else {
+                        ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
                     }
+
+                    mapMark.put(id, null);
+                    fragment.startActivityForResult(intent, FriendsFragment.ACTION_START_CHAT);
                 });
 
         //nhấn giữ để xóa bạn
@@ -536,10 +533,12 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((ItemFriendViewHolder) holder).txtTime.setVisibility(View.VISIBLE);
             if (!listFriend.getListFriend().get(position).message.text.startsWith(id)) {
                 ((ItemFriendViewHolder) holder).txtMessage.setText(listFriend.getListFriend().get(position).message.text);
+                Log.e("message1", listFriend.getListFriend().get(position).message.text);
                 ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
                 ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
             } else {
                 ((ItemFriendViewHolder) holder).txtMessage.setText(listFriend.getListFriend().get(position).message.text.substring((id + "").length()));
+                Log.e("message2", listFriend.getListFriend().get(position).message.text.substring((id + "").length()));
                 ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT_BOLD);
                 ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT_BOLD);
             }
