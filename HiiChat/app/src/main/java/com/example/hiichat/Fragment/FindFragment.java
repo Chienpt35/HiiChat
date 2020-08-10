@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +44,7 @@ public class FindFragment extends Fragment {
     private DatabaseReference db ;
     private FirebaseUser firebaseUser;
 
+
     private static final String TAG = "FindFriend";
 
     ArrayList<User> arr = null;
@@ -64,11 +66,15 @@ public class FindFragment extends Fragment {
 
         db = FirebaseDatabase.getInstance().getReference().child("user");
 
+
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_find_friend, container, false);
+
         builderAlertDialog();
         initView(view);
         getListFriend();
+
         
         return view;
     }
@@ -96,6 +102,8 @@ public class FindFragment extends Fragment {
     private void initView(View view) {
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
         recycleListFriend = (RecyclerView) view.findViewById(R.id.recycleListFriend);
+
+
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,25 +123,49 @@ public class FindFragment extends Fragment {
         TextView tvtOldBegin;
         TextView tvtOldEnd;
         RangeSeekBar rangeSeekBarOld;
-        TextView tvtPossitionBegin;
         TextView tvtPossitionEnd;
-        RangeSeekBar rangeSeekBarPossition;
         Button btnHuy;
         Button btnFind;
+        SeekBar seekBar;
+
 
         spinnerGioiTinh = (Spinner) view.findViewById(R.id.spinnerGioiTinh);
         tvtOldBegin = (TextView) view.findViewById(R.id.tvt_oldBegin);
         tvtOldEnd = (TextView) view.findViewById(R.id.tvt_oldEnd);
         rangeSeekBarOld = (RangeSeekBar) view.findViewById(R.id.rangeSeekBarOld);
-        tvtPossitionBegin = (TextView) view.findViewById(R.id.tvt_PossitionBegin);
         tvtPossitionEnd = (TextView) view.findViewById(R.id.tvt_PossitionEnd);
-        rangeSeekBarPossition = (RangeSeekBar) view.findViewById(R.id.rangeSeekBarPossition);
         btnHuy = (Button) view.findViewById(R.id.btn_Huy);
         btnFind = (Button) view.findViewById(R.id.btnFind);
+        seekBar = (SeekBar) view.findViewById(R.id.seekBar);
+
 
         final AlertDialog alertDialog = builder.create();
 
-        btnHuy.setOnClickListener(new View.OnClickListener() {
+
+            int minimumValue = 10;
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                    tvtPossitionEnd.setText(String.valueOf(i));
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    if(seekBar.getProgress() < minimumValue)
+                        seekBar.setProgress(minimumValue);
+                }
+            });
+
+
+
+
+
+                    btnHuy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 alertDialog.dismiss();
@@ -142,7 +174,7 @@ public class FindFragment extends Fragment {
         btnFind.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "abc", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "abc" + tvtPossitionEnd.getText() , Toast.LENGTH_SHORT).show();
             }
         });
 
