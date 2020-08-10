@@ -59,9 +59,10 @@ public class FindFragment extends Fragment {
     ListView listView;
     ArrayList<User> arr =  new ArrayList<>();
     ArrayList<HashMap<String,String>> arrayList = new ArrayList<HashMap<String, String>>();
+    ArrayList<HashMap<String,String>> save = new ArrayList<HashMap<String, String>>();
 
 
-     private FindFriend findFriend = new FindFriend();
+    private FindFriend findFriend = new FindFriend();
 
 
     public double CalculationByDistance(double latitude1, double latitude2, double longitude1, double longitude2) {
@@ -83,12 +84,11 @@ public class FindFragment extends Fragment {
         double kmInDec = Integer.valueOf(newFormat.format(km));
         double meter = valueResult % 1000;
         double meterInDec = Integer.valueOf(newFormat.format(meter));
-//        Log.e("Radius Value", "" + valueResult + "   KM  " + kmInDec
-//                + " Meter   " + meterInDec + "   " + latitude2 + "    " + longitude2);
         return kmInDec;
     }
     public void getListFriend(){
-
+        arr.removeAll(arr);
+        arrayList.removeAll(arrayList);
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -96,7 +96,6 @@ public class FindFragment extends Fragment {
                 for (DataSnapshot item : dataSnapshot.getChildren()){
                     User user = item.getValue(User.class);
                     arr.add(user);
-//                    findFriendAdapter.notifyDataSetChanged();
                 }
 
                 String email =  SharedPreferenceHelper.getInstance(getActivity()).getUserInfo().email;
@@ -107,29 +106,24 @@ public class FindFragment extends Fragment {
                     }
 
                 }
-//                for(int i = 0; i < arr.size();i++){
-//                    findFriend.avatar_ff = arr.get(i).avata;
-//                    findFriend.name_fF = arr.get(i).name;
-//                    findFriend.gender_ff = arr.get(i).gioiTinh;
-//                    findFriend.yearOld_ff = arr.get(i).tuoi;
-//                    findFriend.range_ff =  CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude);
-//                    Log.e(TAG, "onDataChange: "+ CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude) );
-//            }
-                for (int i=0;i<arr.size();i++)
-                {
-                    double a = CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude);
+
+                for (int i=0;i<arr.size();i++){
                     HashMap<String,String> hashMap=new HashMap<String, String>();//create a hashmap to store the data in key value pair
                     hashMap.put("avatar",arr.get(i).avata);
                     hashMap.put("name", arr.get(i).name);
                     hashMap.put("gender",arr.get(i).gioiTinh);
                     hashMap.put("yearOld",arr.get(i).tuoi);
-                    hashMap.put("range", Double.toString(a) ) ;
+                    hashMap.put("range", Double.toString(CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude)) ) ;
+                    Log.e(TAG, "Arr: " + arr.get(i).longitude +  " ^^ " + arr.get(i).latitude  + " ^^ " + arr.get(i).name);
 
-                    arrayList.add(hashMap);//add the hashmap into arrayList
+                    if(!email.equals(arr.get(i).email)){
+                        save.add(hashMap);//add the hashmap into arrayList
+                    }
                 }
 
-                Log.e(TAG, "Arr: " + arrayList );
-            }
+
+
+                }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(getActivity(), "Error" + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
