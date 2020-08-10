@@ -213,7 +213,9 @@ public class FindFragment extends Fragment {
         final AlertDialog alertDialog = builder.create();
 
 
-            int minimumValue = 10;
+            int minimumValue = 1;
+
+            //location
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -231,21 +233,40 @@ public class FindFragment extends Fragment {
                         seekBar.setProgress(minimumValue);
                 }
             });
+            // age
+            rangeSeekBarOld.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(RangeSeekBar rangeSeekBar, int i, int i1, boolean b) {
+                    tvtOldBegin.setText(String.valueOf(i));
+                    tvtOldEnd.setText(String.valueOf(i1));
+
+                }
+
+                @Override
+                public void onStartTrackingTouch(RangeSeekBar rangeSeekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(RangeSeekBar rangeSeekBar) {
+
+                }
+            });
 
 
 
-
-
-                    btnHuy.setOnClickListener(new View.OnClickListener() {
+            btnHuy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 alertDialog.dismiss();
             }
         });
+
         btnFind.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "abc" + tvtPossitionEnd.getText() , Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "abc" + tvtPossitionEnd.getText()  + "tuoi tu : "  +  tvtOldBegin.getText()
+                        + "-" +tvtOldEnd.getText() + "gioi tinh: "  + gender  , Toast.LENGTH_SHORT).show();
             }
         });
 
