@@ -18,12 +18,15 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hiichat.Adapter.MyArrayAdapter;
+import com.example.hiichat.Data.SharedPreferenceHelper;
+import com.example.hiichat.Model.FindFriend;
 import com.example.hiichat.Model.Type;
 import com.example.hiichat.Model.User;
 import com.example.hiichat.R;
@@ -37,6 +40,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +62,7 @@ public class FindFragment extends Fragment {
     ArrayList<HashMap<String,String>> arrayList = new ArrayList<HashMap<String, String>>();
     ArrayList<HashMap<String,String>> save = new ArrayList<HashMap<String, String>>();
 
+    String gender;
 
     private FindFriend findFriend = new FindFriend();
 
@@ -138,38 +143,27 @@ public class FindFragment extends Fragment {
                              Bundle savedInstanceState) {
         db = FirebaseDatabase.getInstance().getReference().child("user");
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_find_friend, container, false);
+        View view = inflater.inflate(R.layout.find_friend_fragment, container, false);
 
         builderAlertDialog();
         initView(view);
         getListFriend();
 
+
+        String[] from={"avatar","name","gender","yearOld","range"};
+        int[] to ={R.id.avatar_find,R.id.tv_nameFind, R.id.tv_genderFind, R.id.tv_ageFind, R.id.tv_rangeFind};
+        SimpleAdapter simpleAdapter = new SimpleAdapter(getContext(), arrayList, R.layout.rc_item_find_friend, from, to);
+
+        listView.setAdapter(simpleAdapter);
         
         return view;
     }
 
 
-        db.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                for (DataSnapshot item : dataSnapshot.getChildren()){
-                    User user = item.getValue(User.class);
-                    arr.add(user);
-                }
-
-                Log.e(TAG, "onDataChange: " + arr.get(0));
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getActivity(), "Error" + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
     private void initView(View view) {
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
+        listView = view.findViewById(R.id.ff_listView);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
-
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -281,7 +275,7 @@ public class FindFragment extends Fragment {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Type type1 = list.get(position);
+                gender = list.get(position).getNameType();
 //                Log.e("onItemSelected", type1.getType() + " " +  type1.getNameType());
             }
 
