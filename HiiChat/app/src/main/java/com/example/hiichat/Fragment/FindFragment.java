@@ -117,7 +117,7 @@ public class FindFragment extends Fragment {
                     Log.e(TAG, "Arr: " + arr.get(i).longitude +  " ^^ " + arr.get(i).latitude  + " ^^ " + arr.get(i).name);
 
                     if(!email.equals(arr.get(i).email)){
-                        save.add(hashMap);//add the hashmap into arrayList
+                        arrayList.add(hashMap);//add the hashmap into arrayList
                     }
                 }
 
