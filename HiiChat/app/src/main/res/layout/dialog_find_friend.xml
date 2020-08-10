@@ -58,7 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="16"/>
+                android:text="0"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -68,8 +68,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="20"/>
+                android:text="100"/>
         </LinearLayout>
+
 
         <it.sephiroth.android.library.rangeseekbar.RangeSeekBar
             android:id="@+id/rangeSeekBarOld"
@@ -77,9 +78,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:max="100"
-            app:range_progress_endValue="60"
+            app:range_progress_endValue="25"
             app:range_progress_startEnd_minDiff="1"
-            app:range_progress_startValue="50"
+            app:range_progress_startValue="0"
             android:layout_below="@+id/layoutHienThiChonTuoi"
             android:layout_marginVertical="10dp"/>
     </RelativeLayout>
@@ -104,34 +105,28 @@
             android:orientation="horizontal"
             android:layout_alignParentEnd="true">
             <TextView
-                android:id="@+id/tvt_PossitionBegin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="5"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="-"/>
-            <TextView
                 android:id="@+id/tvt_PossitionEnd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="20"/>
+                android:text="0"/>
         </LinearLayout>
 
-        <it.sephiroth.android.library.rangeseekbar.RangeSeekBar
-            android:id="@+id/rangeSeekBarPossition"
-            style="@style/Base.Sephiroth.Widget.RangeSeekBar"
+        <SeekBar
+            android:id="@+id/seekBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="100"
-            app:range_progress_endValue="60"
-            app:range_progress_startEnd_minDiff="1"
-            app:range_progress_startValue="50"
-            android:layout_below="@+id/layoutHienThiChonKhoangCach"
-            android:layout_marginVertical="10dp"/>
+            android:layout_height="27dp"
+            android:layout_marginStart="19dp"
+            android:layout_marginLeft="19dp"
+            android:layout_marginTop="43dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginRight="21dp"
+            android:max="15"
+            android:min="0"
+            android:progress="0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </RelativeLayout>
 
     <LinearLayout

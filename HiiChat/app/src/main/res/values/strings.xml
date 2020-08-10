@@ -17,10 +17,10 @@
     <string name="hint_username">Enter a new username</string>
     <string name="enter_group_name">Enter group name</string>
     <string name="findFriend">Find Friend</string>
-    <string name="notification">Friend Request</string>
+    <string name="notification">Notification</string>
     <string name="friend">Friend</string>
     <string name="group">Group</string>
-    <string name="inFo">Information</string>
+    <string name="inFo">Profile</string>
     <string name="check_internet">Ứng dụng chưa được kết nốt với Internet, vui lòng kiểm tra kết nối và quay lại. Xin cảm ơn !!!</string>
     <string name="msg_subscribed">Subscribed</string>
     <string name="msg_subscribe_failed">Subscribe failed</string>

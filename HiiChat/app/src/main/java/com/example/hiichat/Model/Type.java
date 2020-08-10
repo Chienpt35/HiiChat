@@ -9,6 +9,10 @@ public class Type {
         this.nameType = nameType;
     }
 
+    public Type() {
+
+    }
+
     public String getType() {
         return type;
     }

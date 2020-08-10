@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginVertical="5dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/default_avata"
+        android:background="#00000000"
+        android:layout_gravity="center"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="10dp">
+        <TextView
+            android:id="@+id/tvt_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Thành Chiển"
+            android:textColor="@color/grey_800"
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tvt_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="chienpham@gmail.com"
+            android:textColor="@color/grey_800"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:weightSum="2">
+            <Button
+                android:id="@+id/btnThemBB"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Chấp nhận"
+                android:layout_marginHorizontal="5dp"
+                android:backgroundTint="@color/colorView"
+                android:textColor="@color/white"
+                android:background="@drawable/bogoc_edittext"/>
+            <Button
+                android:id="@+id/btnHuyBB"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Huỷ"
+                android:layout_marginHorizontal="5dp"
+                android:textColor="@color/grey_800"
+                android:background="@drawable/bogoc_edittext"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

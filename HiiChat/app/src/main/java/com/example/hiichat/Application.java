@@ -9,7 +9,6 @@ import com.example.hiichat.Notification.FCMSubSend;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 public class Application extends android.app.Application {
-
     @Override
     public void onCreate() {
         super.onCreate();

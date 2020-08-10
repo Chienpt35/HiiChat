@@ -1,41 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragment.UserProfileFragment"
-    android:orientation="vertical">
+    android:background="@color/grey_100">
 
     <include layout="@layout/toolbar2" android:id="@+id/include"/>
    <LinearLayout
        android:id="@+id/profile"
-       android:background="@color/grey_100"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:orientation="vertical">
+       android:orientation="vertical"
+       android:layout_below="@+id/include">
        <ImageView
+           android:layout_width="match_parent"
+           android:layout_height="218dp"
+           android:scaleType="fitStart"
+           android:src="@drawable/image_header" />
+       <de.hdodenhof.circleimageview.CircleImageView
            android:id="@+id/img_avatar"
            android:layout_gravity="center"
-           android:layout_width="104dp"
-           android:layout_height="104dp"
-           android:layout_marginTop="5dp"
+           android:layout_width="130dp"
+           android:layout_height="130dp"
+           android:layout_marginTop="-100dp"
            android:src="@drawable/default_avata"
-           android:background="#00000000"/>
+           />
        <TextView
            android:layout_gravity="center"
            android:textSize="24sp"
            android:textColor="@android:color/black"
-           android:layout_marginTop="32dp"
+           android:layout_marginTop="15dp"
+           android:layout_marginBottom="10dp"
            android:id="@+id/tv_username"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"/>
    </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_below="@+id/profile"
         android:id="@+id/info_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="vertical" />
-</LinearLayout>
+        android:scrollbars="vertical"
+        android:layout_below="@+id/profile"/>
+</RelativeLayout>

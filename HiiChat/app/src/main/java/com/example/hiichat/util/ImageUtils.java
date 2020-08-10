@@ -76,6 +76,12 @@ public class ImageUtils {
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
+    public static Bitmap getBitmap(String imgBitmap){
+        byte[] decodedString = Base64.decode(imgBitmap, Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        return decodedByte;
+    }
+
     /**
      * Làm giảm số điểm ảnh xuống để tránh lỗi Firebase Database OutOfMemory
      * @param is anh dau vao
