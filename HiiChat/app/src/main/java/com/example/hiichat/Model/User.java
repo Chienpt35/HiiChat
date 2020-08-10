@@ -9,13 +9,10 @@ public class User {
     public String tuoi;
     public Status status;
     public Message message;
-    public double valueLong;
-    public double valueLat;
+    public double longitude;
+    public double latitude;
 
-    public User(Double valueLong, Double valueLat) {
-        this.valueLong = valueLong;
-        this.valueLat = valueLat;
-    }
+
 
 
 
@@ -94,19 +91,19 @@ public class User {
         this.message = message;
     }
 
-    public Double getValueLong() {
-        return valueLong;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setValueLong(Double valueLong) {
-        this.valueLong = valueLong;
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
-    public Double getValueLat() {
-        return valueLat;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setValueLat(Double valueLat) {
-        this.valueLat = valueLat;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 }

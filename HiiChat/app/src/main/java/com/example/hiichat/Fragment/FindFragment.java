@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -14,6 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,26 +35,104 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import it.sephiroth.android.library.rangeseekbar.RangeSeekBar;
 
 public class FindFragment extends Fragment {
 
     private SwipeRefreshLayout swipeRefreshLayout;
-    private RecyclerView recycleListFriend;
     private FloatingActionButton fab;
     private DatabaseReference db ;
     private FirebaseUser firebaseUser;
-
+    private double myLat, myLong;
     private static final String TAG = "FindFriend";
+//    private FindFriendAdapter findFriendAdapter ;
+    LinearLayout linearLayout;
 
-    ArrayList<User> arr = null;
+    ListView listView;
+    ArrayList<User> arr =  new ArrayList<>();
+    ArrayList<HashMap<String,String>> arrayList = new ArrayList<HashMap<String, String>>();
 
 
+     private FindFriend findFriend = new FindFriend();
 
 
+    public double CalculationByDistance(double latitude1, double latitude2, double longitude1, double longitude2) {
+        int Radius = 6371;// radius of earth in Km
+        double lat1 = latitude1;
+        double lat2 = latitude2;
+        double long1 = longitude1;
+        double long2 = longitude2;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(long2 - long1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        double valueResult = Radius * c;
+        double km = valueResult / 1;
+        DecimalFormat newFormat = new DecimalFormat("####");
+        double kmInDec = Integer.valueOf(newFormat.format(km));
+        double meter = valueResult % 1000;
+        double meterInDec = Integer.valueOf(newFormat.format(meter));
+//        Log.e("Radius Value", "" + valueResult + "   KM  " + kmInDec
+//                + " Meter   " + meterInDec + "   " + latitude2 + "    " + longitude2);
+        return kmInDec;
+    }
+    public void getListFriend(){
+
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.e(TAG, "dataSnapshot: " + dataSnapshot.getChildren());
+                for (DataSnapshot item : dataSnapshot.getChildren()){
+                    User user = item.getValue(User.class);
+                    arr.add(user);
+//                    findFriendAdapter.notifyDataSetChanged();
+                }
+
+                String email =  SharedPreferenceHelper.getInstance(getActivity()).getUserInfo().email;
+                for(int i = 0; i < arr.size(); i++){
+                    if(email.equals(arr.get(i).email)){
+                        myLat = arr.get(i).latitude;
+                        myLong = arr.get(i).longitude;
+                    }
+
+                }
+//                for(int i = 0; i < arr.size();i++){
+//                    findFriend.avatar_ff = arr.get(i).avata;
+//                    findFriend.name_fF = arr.get(i).name;
+//                    findFriend.gender_ff = arr.get(i).gioiTinh;
+//                    findFriend.yearOld_ff = arr.get(i).tuoi;
+//                    findFriend.range_ff =  CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude);
+//                    Log.e(TAG, "onDataChange: "+ CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude) );
+//            }
+                for (int i=0;i<arr.size();i++)
+                {
+                    double a = CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude);
+                    HashMap<String,String> hashMap=new HashMap<String, String>();//create a hashmap to store the data in key value pair
+                    hashMap.put("avatar",arr.get(i).avata);
+                    hashMap.put("name", arr.get(i).name);
+                    hashMap.put("gender",arr.get(i).gioiTinh);
+                    hashMap.put("yearOld",arr.get(i).tuoi);
+                    hashMap.put("range", Double.toString(a) ) ;
+
+                    arrayList.add(hashMap);//add the hashmap into arrayList
+                }
+
+                Log.e(TAG, "Arr: " + arrayList );
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getActivity(), "Error" + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,11 +142,7 @@ public class FindFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
-
         db = FirebaseDatabase.getInstance().getReference().child("user");
-
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_find_friend, container, false);
         builderAlertDialog();
@@ -73,8 +152,6 @@ public class FindFragment extends Fragment {
         return view;
     }
 
-    public void getListFriend(){
-        arr = new ArrayList<>();
 
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -95,8 +172,8 @@ public class FindFragment extends Fragment {
     }
     private void initView(View view) {
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
-        recycleListFriend = (RecyclerView) view.findViewById(R.id.recycleListFriend);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,7 +241,7 @@ public class FindFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Type type1 = list.get(position);
-                Log.e("onItemSelected", type1.getType() + " " +  type1.getNameType());
+//                Log.e("onItemSelected", type1.getType() + " " +  type1.getNameType());
             }
 
             @Override
@@ -174,3 +251,99 @@ public class FindFragment extends Fragment {
         });
     }
 }
+
+
+//
+//
+//class FindFriendAdapter extends  RecyclerView.Adapter<FindFriendAdapter.MyViewHolder>{
+//
+//    private List<User> arrList ;
+//    private LayoutInflater layoutInflater;
+//    private Context context;
+//
+//    public FindFriendAdapter(List<User> arrList, Context context) {
+//        this.arrList = arrList;
+//        this.context = context;
+//        layoutInflater = LayoutInflater.from(context);
+//
+//    }
+//
+//    public class  MyViewHolder extends RecyclerView.ViewHolder{
+//        public TextView name, gender, age, range;
+//        public ImageView avatar ;
+//
+//        public MyViewHolder(@NonNull View itemView) {
+//            super(itemView);
+//            name = (TextView) itemView.findViewById(R.id.tv_nameFind);
+//            gender = (TextView) itemView.findViewById(R.id.tv_genderFind);
+//            age = (TextView) itemView.findViewById(R.id.tv_ageFind);
+////            range = (TextView) itemView.findViewById(R.id.tv_rangeFind);
+//
+//            avatar = (ImageView) itemView.findViewById(R.id.avatar_find);
+//
+//
+//
+//        }
+//    }
+//
+//
+//    @NonNull
+//    @Override
+//    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+//        View item = layoutInflater.inflate(R.layout.rc_item_find_friend, parent, false);
+//        return new MyViewHolder(item);
+//    }
+//
+//    @Override
+//    public void onBindViewHolder(@NonNull FindFriendAdapter.MyViewHolder holder, int position) {
+//        User user = arrList.get(position);
+//        holder.name.setText(user.getName());
+//        holder.gender.setText(user.getGioiTinh());
+//        holder.age.setText(user.getTuoi());
+////            holder.range.setText(user.get);
+//        holder.avatar.setImageResource(Integer.parseInt(user.avata));
+//
+//    }
+//
+//    @Override
+//    public int getItemCount() {
+//        return arrList.size();
+//    }
+//}
+
+
+//class FindFriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+//
+//    private List listFindFriend;
+//
+//    private Context context;
+//    private List listFindFriend_ ;
+//    public FindFriendAdapter(List listFindFriend, Context context){
+//            this.listFindFriend = listFindFriend;
+//            this.context = context;
+//
+//
+//    }
+//    @NonNull
+//    @Override
+//    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+//        View view = LayoutInflater.from(context).inflate(R.layout.rc_item_find_friend, parent, false);
+//        return new ItemFriendViewHolder(context, view);
+//    }
+//
+//    @Override
+//    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+////        final String name = listFindFriend.getListFriend().get(position).name;
+////        final String id = listFindFriend.getListFriend().get(position).id;
+////        final String idRoom = listFindFriend.getListFriend().get(position).idRoom;
+////        final String avata = listFindFriend.getListFriend().get(position).avata;
+//
+//
+//    }
+//
+//    @Override
+//    public int getItemCount() {
+//        return 0;
+//    }
+//}
+
