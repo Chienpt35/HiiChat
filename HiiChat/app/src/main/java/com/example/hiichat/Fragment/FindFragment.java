@@ -151,8 +151,10 @@ public class FindFragment extends Fragment {
 
 
         String[] from={"avatar","name","gender","yearOld","range"};
-        int[] to ={R.id.avatar_find,R.id.tv_nameFind, R.id.tv_genderFind, R.id.tv_ageFind, R.id.tv_rangeFind};
+        int[] to ={R.id.avatar_find,R.id.tv_nameFind, R.id.tv_genderFind, R.id.tv_ageFind, R.id.tv_rangeFind, R.id.add_friend_find};
         SimpleAdapter simpleAdapter = new SimpleAdapter(getContext(), arrayList, R.layout.rc_item_find_friend, from, to);
+
+            
 
         listView.setAdapter(simpleAdapter);
         
