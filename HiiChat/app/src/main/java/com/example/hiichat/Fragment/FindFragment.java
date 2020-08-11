@@ -18,12 +18,15 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hiichat.Adapter.MyArrayAdapter;
+import com.example.hiichat.Data.SharedPreferenceHelper;
+import com.example.hiichat.Model.FindFriend;
 import com.example.hiichat.Model.Type;
 import com.example.hiichat.Model.User;
 import com.example.hiichat.R;
@@ -37,6 +40,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,9 +57,11 @@ public class FindFragment extends Fragment {
 //    private FindFriendAdapter findFriendAdapter ;
     LinearLayout linearLayout;
 
+    String gender;
+
     ListView listView;
     ArrayList<User> arr =  new ArrayList<>();
-    ArrayList<HashMap<String,String>> arrayList = new ArrayList<HashMap<String, String>>();
+    ArrayList<HashMap<String,String>> arrayList = new ArrayList<>();
 
 
      private FindFriend findFriend = new FindFriend();
@@ -84,55 +90,7 @@ public class FindFragment extends Fragment {
 //                + " Meter   " + meterInDec + "   " + latitude2 + "    " + longitude2);
         return kmInDec;
     }
-    public void getListFriend(){
 
-        db.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.e(TAG, "dataSnapshot: " + dataSnapshot.getChildren());
-                for (DataSnapshot item : dataSnapshot.getChildren()){
-                    User user = item.getValue(User.class);
-                    arr.add(user);
-//                    findFriendAdapter.notifyDataSetChanged();
-                }
-
-                String email =  SharedPreferenceHelper.getInstance(getActivity()).getUserInfo().email;
-                for(int i = 0; i < arr.size(); i++){
-                    if(email.equals(arr.get(i).email)){
-                        myLat = arr.get(i).latitude;
-                        myLong = arr.get(i).longitude;
-                    }
-
-                }
-//                for(int i = 0; i < arr.size();i++){
-//                    findFriend.avatar_ff = arr.get(i).avata;
-//                    findFriend.name_fF = arr.get(i).name;
-//                    findFriend.gender_ff = arr.get(i).gioiTinh;
-//                    findFriend.yearOld_ff = arr.get(i).tuoi;
-//                    findFriend.range_ff =  CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude);
-//                    Log.e(TAG, "onDataChange: "+ CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude) );
-//            }
-                for (int i=0;i<arr.size();i++)
-                {
-                    double a = CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude);
-                    HashMap<String,String> hashMap=new HashMap<String, String>();//create a hashmap to store the data in key value pair
-                    hashMap.put("avatar",arr.get(i).avata);
-                    hashMap.put("name", arr.get(i).name);
-                    hashMap.put("gender",arr.get(i).gioiTinh);
-                    hashMap.put("yearOld",arr.get(i).tuoi);
-                    hashMap.put("range", Double.toString(a) ) ;
-
-                    arrayList.add(hashMap);//add the hashmap into arrayList
-                }
-
-                Log.e(TAG, "Arr: " + arrayList );
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getActivity(), "Error" + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -142,19 +100,13 @@ public class FindFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        db = FirebaseDatabase.getInstance().getReference().child("user");
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_find_friend, container, false);
 
         builderAlertDialog();
         initView(view);
         getListFriend();
-
-        
-        return view;
-    }
-
-
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -171,8 +123,61 @@ public class FindFragment extends Fragment {
                 Toast.makeText(getActivity(), "Error" + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+        
+        return view;
     }
+
+    public void getListFriend(){
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.e(TAG, "dataSnapshot: " + dataSnapshot.getChildren());
+                if (dataSnapshot != null) {
+                for (DataSnapshot item : dataSnapshot.getChildren()) {
+                    User user = item.getValue(User.class);
+                    arr.add(user);
+//                    findFriendAdapter.notifyDataSetChanged();
+                }
+
+                String email = SharedPreferenceHelper.getInstance(getActivity()).getUserInfo().email;
+                for (int i = 0; i < arr.size(); i++) {
+                    if (email.equals(arr.get(i).email)) {
+                        myLat = arr.get(i).latitude;
+                        myLong = arr.get(i).longitude;
+                    }
+
+                }
+//                for(int i = 0; i < arr.size();i++){
+//                    findFriend.avatar_ff = arr.get(i).avata;
+//                    findFriend.name_fF = arr.get(i).name;
+//                    findFriend.gender_ff = arr.get(i).gioiTinh;
+//                    findFriend.yearOld_ff = arr.get(i).tuoi;
+//                    findFriend.range_ff =  CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude);
+//                    Log.e(TAG, "onDataChange: "+ CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude) );
+//            }
+                for (int i = 0; i < arr.size(); i++) {
+                    double a = CalculationByDistance(myLat, arr.get(i).latitude, myLong, arr.get(i).longitude);
+                    HashMap<String, String> hashMap = new HashMap<String, String>();//create a hashmap to store the data in key value pair
+                    hashMap.put("avatar", arr.get(i).avata);
+                    hashMap.put("name", arr.get(i).name);
+                    hashMap.put("gender", arr.get(i).gioiTinh);
+                    hashMap.put("yearOld", arr.get(i).tuoi);
+                    hashMap.put("range", Double.toString(a));
+
+                    arrayList.add(hashMap);//add the hashmap into arrayList
+                }
+            }
+                Log.e(TAG, "Arr: " + arrayList );
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getActivity(), "Error" + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void initView(View view) {
+        db = FirebaseDatabase.getInstance().getReference().child("user");
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
 

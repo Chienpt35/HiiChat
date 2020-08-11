@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -125,7 +127,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     };
     private File photoFile;
     private MediaRecorder recorder;
-    private RelativeLayout layoutMicro;
+    private CardView layoutMicro;
     private TextView tvtTime;
     private ImageView imgMicroOn;
     private CountDownTimer countDownTimer;
@@ -218,7 +220,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 linearLayout2.setVisibility(View.VISIBLE);
                 r1.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
                 r1.requestLayout();
-                subStart = editWriteMessage.getText().toString().trim();
                 editWriteMessage.setText(subStart);
                 editWriteMessage.setSelection(editWriteMessage.getText().length());
             }
@@ -234,11 +235,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 linearLayout2.setVisibility(View.VISIBLE);
                 r1.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
                 r1.requestLayout();
-                subStart = editWriteMessage.getText().toString().trim();
                 editWriteMessage.setText(subStart);
                 editWriteMessage.setSelection(editWriteMessage.getText().length());
             }
         });
+
         linearLayout2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -286,30 +287,31 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         imgCamera = findViewById(R.id.imgCamera);
         imgImage = findViewById(R.id.imgImage);
         imgMicro = findViewById(R.id.imgMicro);
-        layoutMicro = (RelativeLayout) findViewById(R.id.layoutMicro);
+        layoutMicro = findViewById(R.id.layoutMicro);
 
         setCountDownTimer();
 
 
-        imgMicro.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //verifyMicroPermissions();
+        imgMicro.setOnClickListener(v -> {
+            //verifyMicroPermissions();
+            TransitionManager.beginDelayedTransition(layoutMicro);
+            if (layoutMicro.getVisibility() == View.VISIBLE){
+                layoutMicro.setVisibility(View.GONE);
+            }else {
+                layoutMicro.setVisibility(View.VISIBLE);
                 requestAudioPermissions();
             }
+
         });
-        imgMicroOn.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    startRecording();
-                    Log.e("Recording", " Recording start...");
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    stopRecording();
-                    Log.e("Recording", " Recording stop...");
-                }
-                return true;
+        imgMicroOn.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                startRecording();
+                Log.e("Recording", " Recording start...");
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                stopRecording();
+                Log.e("Recording", " Recording stop...");
             }
+            return true;
         });
 
 
@@ -335,13 +337,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        imgImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                startActivityForResult(intent.createChooser(intent, "Select Image"), REQUEST_IMAGE);
-            }
+        imgImage.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            startActivityForResult(intent.createChooser(intent, "Select Image"), REQUEST_IMAGE);
         });
 
         rootView = findViewById(R.id.r);
@@ -356,11 +355,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void startRecording() {
-        //create file micro
-        File outputFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MediaMaster/Dub/");
-        filePathMicro = new File(outputFolder.getAbsolutePath() + "out" + new Date().getTime() + ".3gpp");
+        try {
+            filePathMicro = createAudioFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Log.e("filePathMicro", filePathMicro.getAbsolutePath());
-        Log.e("outputFolder", outputFolder + "");
+        //Log.e("outputFolder", outputFolder + "");
         countDownTimer.onTick(60000);
         countDownTimer.start();
         if (recorder == null) {
@@ -402,24 +403,37 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         microFileName = timeStamp + "_recorder.3gp";
         final StorageReference fii = FirebaseStorage.getInstance().getReference().child("Recording File").child(microFileName);
         Uri uri = Uri.fromFile(new File(filePathMicro.getAbsolutePath()));
-        fii.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                fii.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        String myUrl2 = uri.toString();
+        fii.putFile(uri).addOnSuccessListener(taskSnapshot -> fii.getDownloadUrl().addOnSuccessListener(uri1 -> {
+            String myUrl2 = uri1.toString();
 
-                        Message newMessage4 = new Message();
-                        newMessage4.text = myUrl2;
-                        newMessage4.idSender = StaticConfig.UID;
-                        newMessage4.idReceiver = roomId;
-                        newMessage4.type = "media";
-                        newMessage4.timestamp = System.currentTimeMillis();
-                        FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage4);
+            Message newMessage4 = new Message();
+            newMessage4.text = myUrl2;
+            newMessage4.idSender = StaticConfig.UID;
+            newMessage4.idReceiver = roomId;
+            newMessage4.type = "media";
+            newMessage4.timestamp = System.currentTimeMillis();
+            FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage4);
+
+            final String msg = "Đã gửi tệp âm thanh";
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("user").child(StaticConfig.UID);
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if (notify) {
+                        sendNotification(idFriend.get(0).toString(), user.name, msg, "Tin nhắn mới !!!");
                     }
-                });
-            }
+                    notify = false;
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+        })).addOnFailureListener(e -> {
+            Log.e("Failse", "uploadAudio: " + e.toString() );
         });
     }
 
@@ -456,10 +470,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showOrHideViewMicro() {
-        TransitionManager.beginDelayedTransition(layoutMicro);
-        if (layoutMicro.getVisibility() == View.GONE) {
+        if (layoutMicro.getVisibility() == View.VISIBLE){
             countDownTimer.onTick(60000);
-            layoutMicro.setVisibility(View.VISIBLE);
             Toast.makeText(this, "Nhấn giữ để ghi âm, thả để gửi !", Toast.LENGTH_LONG).show();
         }
     }
@@ -576,7 +588,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        Log.e("storageDir", storageDir + "");
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
@@ -584,6 +595,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         );
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = imageFileName + "camera.jpg";
+        return image;
+    }
+
+    private File createAudioFile() throws IOException{
+        // Create an audio file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String audioFileName = "Audio_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_MUSIC);
+        File image = File.createTempFile(
+                audioFileName,  /* prefix */
+                ".3gp",         /* suffix */
+                storageDir      /* directory */
+        );
+
         return image;
     }
 

@@ -72,14 +72,17 @@
         android:layout_height="wrap_content"
         android:layout_above="@id/line"/>
 
-    <RelativeLayout
+    <androidx.cardview.widget.CardView
         android:id="@+id/layoutMicro"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/line"
-        android:alpha="0.7"
-        android:background="@color/grey_200"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:elevation="20dp"
+        app:cardCornerRadius="15dp">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
         <TextView
             android:id="@+id/tvt_time"
             android:layout_width="wrap_content"
@@ -89,15 +92,18 @@
             android:textColor="@color/grey_800"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp" />
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imgMicroOn"
             android:layout_centerInParent="true"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@drawable/iconfinder_miccro"
             android:visibility="visible"
-            android:background="@drawable/animation_buton"/>
+            app:civ_border_width="2dp"
+            app:civ_border_color="@color/grey_500"
+            app:civ_circle_background_color="@color/white"/>
     </RelativeLayout>
+    </androidx.cardview.widget.CardView>
 
     <View
         android:id="@+id/line"
@@ -167,7 +173,6 @@
                 android:drawablePadding="20dp"
                 android:hint="Aa"
                 android:inputType="textLongMessage"
-                android:maxLines="1"
                 android:paddingLeft="7dp"
                 android:paddingRight="7dp"
                 android:textSize="15sp" />

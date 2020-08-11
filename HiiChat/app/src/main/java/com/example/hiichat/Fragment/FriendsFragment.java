@@ -535,7 +535,7 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (!listFriend.getListFriend().get(position).message.text.startsWith(id)) {
                 message = listFriend.getListFriend().get(position).message.text;
                 if (message.startsWith("https://firebasestorage.googleapis.com/")){
-                    ((ItemFriendViewHolder) holder).txtMessage.setText("Đã gửi 1 ảnh !!!");
+                    ((ItemFriendViewHolder) holder).txtMessage.setText("Đã gửi 1 tệp !!!");
                     ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
                     ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
                 }else {
@@ -543,10 +543,23 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
                     ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
                 }
+//                if (listFriend.getListFriend().get(position).message.type.equals("text")){
+//                    ((ItemFriendViewHolder) holder).txtMessage.setText(message);
+//                    ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
+//                    ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
+//                }else if (listFriend.getListFriend().get(position).message.type.equals("image")){
+//                    ((ItemFriendViewHolder) holder).txtMessage.setText("Đã gửi 1 ảnh !!!");
+//                    ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
+//                    ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
+//                }else if (listFriend.getListFriend().get(position).message.type.equals("media")){
+//                    ((ItemFriendViewHolder) holder).txtMessage.setText("Đã gửi 1 tệp âm thanh !!!");
+//                    ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
+//                    ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
+//                }
             } else {
                 message = listFriend.getListFriend().get(position).message.text.substring((id + "").length());
                 if (message.startsWith("https://firebasestorage.googleapis.com/")){
-                    ((ItemFriendViewHolder) holder).txtMessage.setText("Đã gửi 1 ảnh !!!");
+                    ((ItemFriendViewHolder) holder).txtMessage.setText("Đã gửi 1 tệp !!!");
                     ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT_BOLD);
                     ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT_BOLD);
                 }else {
@@ -554,6 +567,19 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT_BOLD);
                     ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT_BOLD);
                 }
+//                if (listFriend.getListFriend().get(position).message.type.equals("text")){
+//                    ((ItemFriendViewHolder) holder).txtMessage.setText(message);
+//                    ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
+//                    ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
+//                }else if (listFriend.getListFriend().get(position).message.type.equals("image")){
+//                    ((ItemFriendViewHolder) holder).txtMessage.setText("Đã gửi 1 ảnh !!!");
+//                    ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
+//                    ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
+//                }else if (listFriend.getListFriend().get(position).message.type.equals("media")){
+//                    ((ItemFriendViewHolder) holder).txtMessage.setText("Đã gửi 1 tệp âm thanh !!!");
+//                    ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
+//                    ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
+//                }
             }
             String time = new SimpleDateFormat("EEE, d MMM yyyy").format(new Date(listFriend.getListFriend().get(position).message.timestamp));
             String today = new SimpleDateFormat("EEE, d MMM yyyy").format(new Date(System.currentTimeMillis()));

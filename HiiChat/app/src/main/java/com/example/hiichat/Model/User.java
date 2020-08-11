@@ -13,9 +13,6 @@ public class User {
     public double latitude;
 
 
-
-
-
     public User(){
         status = new Status();
         message = new Message();
