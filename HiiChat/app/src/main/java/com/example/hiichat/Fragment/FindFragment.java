@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.hiichat.Adapter.FindFragmentAdapter;
 import com.example.hiichat.Adapter.MyArrayAdapter;
 import com.example.hiichat.Data.SharedPreferenceHelper;
 import com.example.hiichat.Model.FindFriend;
@@ -57,74 +58,38 @@ public class FindFragment extends Fragment {
 //    private FindFriendAdapter findFriendAdapter ;
     LinearLayout linearLayout;
 
-    ListView listView;
+    RecyclerView listView;
+    Button btnFind;
     ArrayList<User> arr =  new ArrayList<>();
     ArrayList<HashMap<String,String>> arrayList = new ArrayList<HashMap<String, String>>();
     ArrayList<HashMap<String,String>> save = new ArrayList<HashMap<String, String>>();
 
     String gender;
 
-    private FindFriend findFriend = new FindFriend();
+   FindFragmentAdapter findFragmentAdapter;
 
 
-    public double CalculationByDistance(double latitude1, double latitude2, double longitude1, double longitude2) {
-        int Radius = 6371;// radius of earth in Km
-        double lat1 = latitude1;
-        double lat2 = latitude2;
-        double long1 = longitude1;
-        double long2 = longitude2;
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(long2 - long1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(Math.toRadians(lat1))
-                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
-                * Math.sin(dLon / 2);
-        double c = 2 * Math.asin(Math.sqrt(a));
-        double valueResult = Radius * c;
-        double km = valueResult / 1;
-        DecimalFormat newFormat = new DecimalFormat("####");
-        double kmInDec = Integer.valueOf(newFormat.format(km));
-        double meter = valueResult % 1000;
-        double meterInDec = Integer.valueOf(newFormat.format(meter));
-        return kmInDec;
-    }
     public void getListFriend(){
         arr.removeAll(arr);
-        arrayList.removeAll(arrayList);
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.e(TAG, "dataSnapshot: " + dataSnapshot.getChildren());
-                for (DataSnapshot item : dataSnapshot.getChildren()){
-                    User user = item.getValue(User.class);
-                    arr.add(user);
-                }
-
-                String email =  SharedPreferenceHelper.getInstance(getActivity()).getUserInfo().email;
-                for(int i = 0; i < arr.size(); i++){
-                    if(email.equals(arr.get(i).email)){
-                        myLat = arr.get(i).latitude;
-                        myLong = arr.get(i).longitude;
+                if (dataSnapshot != null) {
+                    for (DataSnapshot item : dataSnapshot.getChildren()) {
+                        User user = item.getValue(User.class);
+                        arr.add(user);
                     }
 
-                }
-
-                for (int i=0;i<arr.size();i++){
-                    HashMap<String,String> hashMap=new HashMap<String, String>();//create a hashmap to store the data in key value pair
-                    hashMap.put("avatar",arr.get(i).avata);
-                    hashMap.put("name", arr.get(i).name);
-                    hashMap.put("gender",arr.get(i).gioiTinh);
-                    hashMap.put("yearOld",arr.get(i).tuoi);
-                    hashMap.put("range", Double.toString(CalculationByDistance(myLat, arr.get(i).latitude, myLong , arr.get(i).longitude)) ) ;
-                    Log.e(TAG, "Arr: " + arr.get(i).longitude +  " ^^ " + arr.get(i).latitude  + " ^^ " + arr.get(i).name);
-
-                    if(!email.equals(arr.get(i).email)){
-                        arrayList.add(hashMap);//add the hashmap into arrayList
+                    String email = SharedPreferenceHelper.getInstance(getActivity()).getUserInfo().email;
+                    for (int i = 0; i < arr.size(); i++) {
+                        if (email.equals(arr.get(i).email)) {
+                            arr.remove(i);
+                        }
                     }
+                    //ánh xạ list ra đây
+                    findFragmentAdapter.setArrayList(arr);
+                    findFragmentAdapter.notifyDataSetChanged();
                 }
-
-
-
                 }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -148,16 +113,7 @@ public class FindFragment extends Fragment {
         builderAlertDialog();
         initView(view);
         getListFriend();
-
-
-        String[] from={"avatar","name","gender","yearOld","range"};
-        int[] to ={R.id.avatar_find,R.id.tv_nameFind, R.id.tv_genderFind, R.id.tv_ageFind, R.id.tv_rangeFind, R.id.add_friend_find};
-        SimpleAdapter simpleAdapter = new SimpleAdapter(getContext(), arrayList, R.layout.rc_item_find_friend, from, to);
-
-            
-
-        listView.setAdapter(simpleAdapter);
-        
+        btnFind = view.findViewById(R.id.add_friend_find);
         return view;
     }
 
@@ -165,6 +121,10 @@ public class FindFragment extends Fragment {
     private void initView(View view) {
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
         listView = view.findViewById(R.id.ff_listView);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        listView.setLayoutManager(linearLayoutManager);
+        findFragmentAdapter = new FindFragmentAdapter(arr, getContext());
+        listView.setAdapter(findFragmentAdapter);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -173,7 +133,6 @@ public class FindFragment extends Fragment {
             }
         });
     }
-
     private AlertDialog builderAlertDialog(){
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater1 = getLayoutInflater();
@@ -264,7 +223,6 @@ public class FindFragment extends Fragment {
 
         return alertDialog;
     }
-
     private void setDataSpinner(final Spinner spinner){
         Type type = new Type("1", "Nam");
         Type type2 = new Type("0", "Nữ");
@@ -290,97 +248,5 @@ public class FindFragment extends Fragment {
 }
 
 
-//
-//
-//class FindFriendAdapter extends  RecyclerView.Adapter<FindFriendAdapter.MyViewHolder>{
-//
-//    private List<User> arrList ;
-//    private LayoutInflater layoutInflater;
-//    private Context context;
-//
-//    public FindFriendAdapter(List<User> arrList, Context context) {
-//        this.arrList = arrList;
-//        this.context = context;
-//        layoutInflater = LayoutInflater.from(context);
-//
-//    }
-//
-//    public class  MyViewHolder extends RecyclerView.ViewHolder{
-//        public TextView name, gender, age, range;
-//        public ImageView avatar ;
-//
-//        public MyViewHolder(@NonNull View itemView) {
-//            super(itemView);
-//            name = (TextView) itemView.findViewById(R.id.tv_nameFind);
-//            gender = (TextView) itemView.findViewById(R.id.tv_genderFind);
-//            age = (TextView) itemView.findViewById(R.id.tv_ageFind);
-////            range = (TextView) itemView.findViewById(R.id.tv_rangeFind);
-//
-//            avatar = (ImageView) itemView.findViewById(R.id.avatar_find);
-//
-//
-//
-//        }
-//    }
-//
-//
-//    @NonNull
-//    @Override
-//    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//        View item = layoutInflater.inflate(R.layout.rc_item_find_friend, parent, false);
-//        return new MyViewHolder(item);
-//    }
-//
-//    @Override
-//    public void onBindViewHolder(@NonNull FindFriendAdapter.MyViewHolder holder, int position) {
-//        User user = arrList.get(position);
-//        holder.name.setText(user.getName());
-//        holder.gender.setText(user.getGioiTinh());
-//        holder.age.setText(user.getTuoi());
-////            holder.range.setText(user.get);
-//        holder.avatar.setImageResource(Integer.parseInt(user.avata));
-//
-//    }
-//
-//    @Override
-//    public int getItemCount() {
-//        return arrList.size();
-//    }
-//}
 
-
-//class FindFriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-//
-//    private List listFindFriend;
-//
-//    private Context context;
-//    private List listFindFriend_ ;
-//    public FindFriendAdapter(List listFindFriend, Context context){
-//            this.listFindFriend = listFindFriend;
-//            this.context = context;
-//
-//
-//    }
-//    @NonNull
-//    @Override
-//    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//        View view = LayoutInflater.from(context).inflate(R.layout.rc_item_find_friend, parent, false);
-//        return new ItemFriendViewHolder(context, view);
-//    }
-//
-//    @Override
-//    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-////        final String name = listFindFriend.getListFriend().get(position).name;
-////        final String id = listFindFriend.getListFriend().get(position).id;
-////        final String idRoom = listFindFriend.getListFriend().get(position).idRoom;
-////        final String avata = listFindFriend.getListFriend().get(position).avata;
-//
-//
-//    }
-//
-//    @Override
-//    public int getItemCount() {
-//        return 0;
-//    }
-//}
 

@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="140dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginVertical="5dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/avatar_find"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:src="@drawable/btn_add_find"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/default_avata"
         />
 
     <LinearLayout
@@ -90,18 +88,24 @@
                 android:textAlignment="center"
                 />
         </LinearLayout>
-
         <Button
             android:id="@+id/add_friend_find"
-            android:layout_width="260dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="10dp"
-            android:textAlignment="center"
-            android:textSize="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="Thêm bạn bè"
-            android:background="@drawable/btn_add_find"
-            android:textColor="#fff"
-            />
+            android:layout_marginHorizontal="5dp"
+            android:backgroundTint="@color/colorView"
+            android:textColor="@color/white"
+            android:background="@drawable/bogoc_edittext" />
+        <TextView
+            android:id="@+id/tvt_isFriend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Đã là bạn bè của bạn"
+            android:textColor="@color/grey_500"
+            android:visibility="gone"/>
+
     </LinearLayout>
 
 </LinearLayout>
