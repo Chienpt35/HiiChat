@@ -1,6 +1,6 @@
 package com.example.hiichat.Model;
 
-public class User {
+public class User implements Comparable<User> {
     public String id;
     public String name;
     public String email;
@@ -105,5 +105,10 @@ public class User {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+    }
+
+    @Override
+    public int compareTo(User o) {
+        return 0;
     }
 }

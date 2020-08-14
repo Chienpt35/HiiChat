@@ -92,7 +92,7 @@ public class FindFragmentAdapter extends RecyclerView.Adapter<FindFragmentHolder
             requestFriend(position, holder);
         });
     }
-    private void getLocationUser() {
+    public void getLocationUser() {
         FirebaseDatabase.getInstance().getReference("user").child(StaticConfig.UID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
