@@ -275,12 +275,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         btnSend = (ImageButton) findViewById(R.id.btnSend);
         btnSend.setOnClickListener(this);
         findViewById(R.id.imgBack).setSelected(true);
-        findViewById(R.id.imgBack).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        findViewById(R.id.imgBack).setOnClickListener(v -> finish());
         toolbar = findViewById(R.id.toolbar);
         tvtTime = (TextView) findViewById(R.id.tvt_time);
         imgMicroOn = (ImageView) findViewById(R.id.imgMicroOn);
@@ -320,12 +315,49 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         frameLayout = findViewById(R.id.frameLayout);
 
         imgVideoCall = findViewById(R.id.imgVideoCall);
-        imgVideoCall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ChatActivity.this, CallingActivity.class);
-                startActivity(intent);
-            }
+        imgVideoCall.setOnClickListener(v -> {
+            String receiverUserID = idFriend.get(0).toString();
+            DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("user");
+            usersRef.child(receiverUserID)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (!dataSnapshot.hasChild("Calling") && !dataSnapshot.hasChild("Ringing")) {
+                                //Log.e("checked", "onDataChange: " + checked);
+
+                                final HashMap<String, Object> callingHashMap = new HashMap<>();
+                                callingHashMap.put("calling", receiverUserID);
+
+                                usersRef.child(StaticConfig.UID)
+                                        .child("Calling")
+                                        .updateChildren(callingHashMap)
+                                        .addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                final HashMap<String, Object> ringHashMap = new HashMap<>();
+                                                ringHashMap.put("ringing", StaticConfig.UID);
+
+                                                usersRef.child(receiverUserID)
+                                                        .child("Ringing")
+                                                        .updateChildren(ringHashMap)
+                                                        .addOnCompleteListener(task1 -> {
+                                                            if (task1.isSuccessful()) {
+                                                                Intent intent = new Intent(ChatActivity.this, CallingActivity.class);
+                                                                intent.putExtra(StaticConfig.USER_VISIT, idFriend.get(0).toString());
+                                                                startActivity(intent);
+                                                            }
+                                                        });
+                                            }
+                                        });
+                            }else {
+                                Toast.makeText(ChatActivity.this, "Người nhận đang có cuộc gọi khác, vui lòng gọi lại sau !!!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
         });
 
         editWriteMessage = findViewById(R.id.editWriteMessage);

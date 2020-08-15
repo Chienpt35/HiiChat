@@ -13,5 +13,5 @@ public class StaticConfig {
     public static String INTENT_KEY_CHAT_ROOM_ID = "roomid";
     public static long TIME_TO_REFRESH = 10 * 1000;
     public static long TIME_TO_OFFLINE = 2 * 60 * 1000;
-    public static String token = "";
+    public static String USER_VISIT = "";
 }

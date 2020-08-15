@@ -43,7 +43,7 @@
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="20dp"
-                android:visibility="gone"/>
+                android:visibility="visible"/>
         </RelativeLayout>
 
     </com.google.android.material.appbar.AppBarLayout>

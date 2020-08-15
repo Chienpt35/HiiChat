@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.telecom.Call;
 import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
@@ -36,6 +37,7 @@ import com.example.hiichat.Model.ListFriend;
 import com.example.hiichat.Model.User;
 import com.example.hiichat.R;
 import com.example.hiichat.Service.ServiceUtils;
+import com.example.hiichat.UI.CallingActivity;
 import com.example.hiichat.UI.ChatActivity;
 import com.example.hiichat.UI.SearchFriendActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -79,9 +81,32 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private RelativeLayout layoutSearch;
     private ArrayList<User> list;
     private User user;
+    private String calledBy = "";
 
 
+    private void checkForReceivingCall() {
+        FirebaseDatabase.getInstance().getReference("user").child(StaticConfig.UID).child("Ringing")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild("ringing")){
 
+                            Log.e("checkForReceivingCall", "checkForReceivingCall");
+
+                            calledBy = dataSnapshot.child("ringing").getValue().toString();
+
+                            Intent intent = new Intent(getContext(), CallingActivity.class);
+                            intent.putExtra(StaticConfig.USER_VISIT, calledBy);
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+    }
 
     public FriendsFragment() {
         onClickFloatButton = new FragFriendClickFloatButton();
@@ -190,6 +215,9 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
             }
         });
+
+        checkForReceivingCall();
+
 
         return layout;
     }
