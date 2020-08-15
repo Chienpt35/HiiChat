@@ -39,7 +39,7 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/sex_find"
+                android:background="@drawable/gender"
                 />
             <TextView
                 android:id="@+id/tv_genderFind"
@@ -54,7 +54,7 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="10dp"
-                android:background="@drawable/year_old"/>
+                android:background="@drawable/age"/>
             <TextView
                 android:id="@+id/tv_ageFind"
                 android:layout_width="40dp"
@@ -68,7 +68,7 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="10dp"
-                android:background="@drawable/range_find"/>
+                android:background="@drawable/location"/>
             <TextView
                 android:id="@+id/tv_rangeFind"
                 android:layout_width="wrap_content"
