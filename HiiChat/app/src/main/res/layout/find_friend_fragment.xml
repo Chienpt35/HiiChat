@@ -7,19 +7,17 @@
     tools:context=".Fragment.FriendsFragment">
 
     <include layout="@layout/toobal" android:id="@+id/include"/>
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/include">
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
             android:layout_marginTop="50dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/ff_listView"
             />
-
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
