@@ -193,6 +193,15 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         IntentFilter intentFilter = new IntentFilter(ACTION_DELETE_FRIEND);
         getContext().registerReceiver(deleteFriendReceiver, intentFilter);
 
+
+        checkForReceivingCall();
+
+        getListFriend();
+
+        return layout;
+    }
+
+    private void getListFriend(){
         DatabaseReference userReference = FirebaseDatabase.getInstance().getReference().child("user");
         userReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -215,11 +224,6 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
             }
         });
-
-        checkForReceivingCall();
-
-
-        return layout;
     }
 
     private void makeListUsers(ArrayList<User> list) {
