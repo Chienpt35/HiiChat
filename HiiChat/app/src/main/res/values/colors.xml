@@ -19,4 +19,6 @@
     <color name="grey_100">#F5F5F5</color>
     <color name="grey_800">#212121</color>
     <color name="colorMessagerUser">#E43167FB</color>
+    <color name="dialog">#4CAF50</color>
+
 </resources>

@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:background="@color/colorPink"
+    android:background="@color/dialog"
+
     android:layout_height="wrap_content">
 
 
@@ -22,6 +23,7 @@
             android:textColor="@color/white"
             android:textSize="18dp"/>
         <Spinner
+            android:backgroundTint="@color/white"
             android:id="@+id/spinnerGioiTinh"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,12 +56,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
+                android:textColor="@color/colorIndivateTab"
                 android:text="0"/>
             <TextView
+                android:textColor="@color/colorIndivateTab"
+
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="-"/>
             <TextView
+                android:textColor="@color/colorIndivateTab"
+
                 android:id="@+id/tvt_oldEnd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -102,6 +109,7 @@
             android:orientation="horizontal"
             android:layout_alignParentEnd="true">
             <TextView
+                android:textColor="@color/colorIndivateTab"
                 android:id="@+id/tvt_PossitionEnd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -147,7 +155,7 @@
             android:layout_height="wrap_content"
             android:text="Tìm kiếm"
             android:background="@drawable/botron_edittext"
-            android:backgroundTint="@color/colorView"/>
+            android:backgroundTint="@color/colorIndivateTab"/>
     </LinearLayout>
 
 </LinearLayout>
