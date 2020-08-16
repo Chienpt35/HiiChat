@@ -8,8 +8,10 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,9 +30,11 @@ import com.example.hiichat.Model.mLocation;
 import com.example.hiichat.Notification.Token;
 import com.example.hiichat.Service.ServiceUtils;
 import com.example.hiichat.UI.LoginActivity;
+import com.example.hiichat.UI.VideoChatActivity;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -44,26 +48,30 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.opentok.android.Session;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
+
+public class MainActivity extends AppCompatActivity {
     private static String TAG = "MainActivity";
-    private Location location ;
-    private GoogleApiClient gac ;
+    private Location location;
     private FloatingActionButton floatButton;
     private ViewPagerAdapter adapter;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseUser user;
     private BottomNavigationView bottomNavigation;
-    DatabaseReference mdata ;
-
+    private DatabaseReference mdata;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private static final int ACCESS_FINE_LOCATION_PERM = 678;
 
 
     @Override
@@ -76,19 +84,81 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         floatButton = (FloatingActionButton) findViewById(R.id.fab);
         initBottom();
         initFirebase();
-        if(checkPlayServices()){
-            buildGoogleApiClient();
-        }
+
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 updateToken(task.getResult().getToken());
             }
         });
 
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        requestPermissions();
     }
 
-    public void setSelectedFindFragment(){
-        getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new FindFragment()).commit();
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @AfterPermissionGranted(ACCESS_FINE_LOCATION_PERM)
+    private void requestPermissions() {
+        String[] perms = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+
+            getLocation();
+
+
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, " Vui lòng cho phép truy cập vị trí !!!",
+                    ACCESS_FINE_LOCATION_PERM, perms);
+        }
+    }
+
+    private void getLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(task -> {
+            Location location = task.getResult();
+            if (location != null){
+                try {
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+                    mdata.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.hasChild("latitude") && dataSnapshot.hasChild("longitude")){
+                                final HashMap<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("latitude", latitude);
+                                hashMap.put("longitude", longitude);
+
+                                mdata.updateChildren(hashMap).addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()){
+                                        Toast.makeText(MainActivity.this, "Update location success !!!", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }catch (Exception e){
+                    Log.e(TAG, "getLocation: " + e.getMessage() );
+                }
+            }
+        });
     }
 
     private void updateToken(String token) {
@@ -134,73 +204,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
     }
 
-    private void getLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Kiểm tra quyền hạn
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 2);
-        } else {
-            location = LocationServices.FusedLocationApi.getLastLocation(gac);
-            if (location != null) {
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-
-
-                mdata.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (!dataSnapshot.child("latitude").exists() && !dataSnapshot.child("longitude").exists()){
-                            final HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("latitude", latitude);
-                            hashMap.put("longitude", longitude);
-
-                            mdata.updateChildren(hashMap).addOnCompleteListener(task -> {
-                                if (task.isSuccessful()){
-                                    Toast.makeText(MainActivity.this, "Update location success !!!", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-
-
-            } else {
-                Toast.makeText(this, "Hay bat dinh vi de tim kiem", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-    protected synchronized void buildGoogleApiClient() {
-        if (gac == null) {
-            gac = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API).build();
-        }
-    }
-    private boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this, 1000).show();
-            } else {
-                Toast.makeText(this, "Thiết bị này không hỗ trợ.", Toast.LENGTH_LONG).show();
-                finish();
-            }
-            return false;
-        }
-        return true;
-    }
-
-
     @Override
     protected void onStart() {
         super.onStart();
-        gac.connect();
         mAuth.addAuthStateListener(mAuthListener);
         ServiceUtils.stopServiceFriendChat(getApplicationContext(), false);
     }
@@ -208,8 +214,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onStop() {
         super.onStop();
-
-        gac.disconnect();
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
@@ -263,19 +267,4 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
-        getLocation();
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        gac.connect();
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(MainActivity.this, "Loi ket noi"+ connectionResult.getErrorMessage(), Toast.LENGTH_SHORT).show();
-    }
 }
