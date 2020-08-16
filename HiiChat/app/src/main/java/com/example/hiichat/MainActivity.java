@@ -32,6 +32,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,6 +44,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -138,8 +141,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             if (location != null) {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-                mdata.child("latitude").setValue(latitude);
-                mdata.child("longitude").setValue(longitude);
+
+                final HashMap<String, Object> hashMap = new HashMap<>();
+                hashMap.put("latitude", latitude);
+                hashMap.put("longitude", longitude);
+
+                mdata.updateChildren(hashMap).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()){
+                        Toast.makeText(this, "Update location success !!!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             } else {
                 Toast.makeText(this, "Hay bat dinh vi de tim kiem", Toast.LENGTH_SHORT).show();
             }
