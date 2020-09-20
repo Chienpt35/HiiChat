@@ -76,9 +76,12 @@ public class FindFragmentAdapter extends RecyclerView.Adapter<FindFragmentHolder
 
     @Override
     public void onBindViewHolder(@NonNull FindFragmentHolder holder, int position) {
-        if (!list.get(position).avata.equals("default")){
-            holder.avatarFind.setImageBitmap(ImageUtils.getBitmap(list.get(position).avata));
+        if(list.get(position).avata != null){
+            if (!list.get(position).avata.equals("default")){
+                holder.avatarFind.setImageBitmap(ImageUtils.getBitmap(list.get(position).avata));
+            }
         }
+
         holder.tvNameFind.setText(list.get(position).name);
         holder.tvGenderFind.setText(list.get(position).gioiTinh);
         holder.tvAgeFind.setText(list.get(position).tuoi);
@@ -186,30 +189,33 @@ public class FindFragmentAdapter extends RecyclerView.Adapter<FindFragmentHolder
         });
     }
     private void isFriend(int position, FindFragmentHolder holder){
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Request Friend")
-                .child(StaticConfig.UID).child(list.get(position).id);
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() != null){
-                    if (dataSnapshot.getValue().toString().equals("true")){
-                        holder.addFriendFind.setVisibility(View.GONE);
-                        holder.tvt_isFriend.setVisibility(View.VISIBLE);
-                    }else if (dataSnapshot.getValue().toString().equals("false")){
-                        holder.addFriendFind.setText("Đã gửi lời mời kết bạn");
-                        holder.addFriendFind.setClickable(false);
-                    }else {
-                        holder.addFriendFind.setVisibility(View.VISIBLE);
-                        holder.tvt_isFriend.setVisibility(View.GONE);
+        if (list.get(position).id != null ){
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Request Friend")
+                    .child(StaticConfig.UID).child(list.get(position).id);
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.getValue() != null){
+                        if (dataSnapshot.getValue().toString().equals("true")){
+                            holder.addFriendFind.setVisibility(View.GONE);
+                            holder.tvt_isFriend.setVisibility(View.VISIBLE);
+                        }else if (dataSnapshot.getValue().toString().equals("false")){
+                            holder.addFriendFind.setText("Đã gửi lời mời kết bạn");
+                            holder.addFriendFind.setClickable(false);
+                        }else {
+                            holder.addFriendFind.setVisibility(View.VISIBLE);
+                            holder.tvt_isFriend.setVisibility(View.GONE);
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        }
+
     }
 public double CalculationByDistance(double latitude1, double latitude2, double longitude1, double longitude2) {
     int Radius = 6371;// radius of earth in Km

@@ -228,22 +228,25 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private void makeListUsers(ArrayList<User> list) {
         for (int i = 0; i < list.size(); i++) {
-            DatabaseReference requestReference = FirebaseDatabase.getInstance().getReference().child("Request Friend")
-                    .child(StaticConfig.UID).child(list.get(i).id);
-            int finalI = i;
-            requestReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.getValue() != null && dataSnapshot.getValue().toString().equals("true")){
-                        onClickFloatButton.getInstance(getContext()).findIDEmail(list.get(finalI).email);
+            if(list.get(i).id != null ){
+                DatabaseReference requestReference = FirebaseDatabase.getInstance().getReference().child("Request Friend")
+                        .child(StaticConfig.UID).child(list.get(i).id);
+                int finalI = i;
+                requestReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.getValue() != null && dataSnapshot.getValue().toString().equals("true")){
+                            onClickFloatButton.getInstance(getContext()).findIDEmail(list.get(finalI).email);
+                        }
                     }
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                }
-            });
+                    }
+                });
+            }
+
         }
     }
 

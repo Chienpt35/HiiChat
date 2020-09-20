@@ -244,10 +244,10 @@ public class UserProfileFragment extends Fragment {
         Configuration emailConfig = new Configuration(EMAIL_LABEL, myAccount.email, R.mipmap.ic_email);
         listConfig.add(emailConfig);
 
-        Configuration resetPass = new Configuration(RESETPASS_LABEL, "", R.mipmap.ic_restore);
+        Configuration resetPass = new Configuration(RESETPASS_LABEL, "", R.drawable.change_pass);
         listConfig.add(resetPass);
 
-        Configuration signout = new Configuration(SIGNOUT_LABEL, "", R.mipmap.ic_power_settings);
+        Configuration signout = new Configuration(SIGNOUT_LABEL, "", R.drawable.iconfinder_sign_out);
         listConfig.add(signout);
     }
 

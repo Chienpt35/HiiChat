@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,7 +55,7 @@ import java.util.Map;
 import it.sephiroth.android.library.rangeseekbar.RangeSeekBar;
 
 public class FindFragment extends Fragment {
-    private SwipeRefreshLayout swipeRefreshLayout;
+
     private FloatingActionButton fab;
     private DatabaseReference db ;
     private FirebaseUser firebaseUser;
@@ -120,7 +120,6 @@ public class FindFragment extends Fragment {
 
     private void initView(View view) {
         db = FirebaseDatabase.getInstance().getReference().child("user");
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
         listView = view.findViewById(R.id.ff_listView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         listView.setLayoutManager(linearLayoutManager);
@@ -162,7 +161,7 @@ public class FindFragment extends Fragment {
 
 
         final AlertDialog alertDialog = builder.create();
-            int minimumValue = 1;
+            int minimumValue = 0;
             //location
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override

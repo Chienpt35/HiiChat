@@ -60,7 +60,6 @@
                 android:text="0"/>
             <TextView
                 android:textColor="@color/colorIndivateTab"
-
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="-"/>
@@ -121,11 +120,8 @@
             android:id="@+id/seekBar"
             android:layout_width="match_parent"
             android:layout_height="27dp"
-            android:layout_marginStart="19dp"
-            android:layout_marginLeft="19dp"
             android:layout_marginTop="43dp"
             android:layout_marginEnd="21dp"
-            android:layout_marginRight="21dp"
             android:max="15"
             android:min="0"
             android:progress="0"
