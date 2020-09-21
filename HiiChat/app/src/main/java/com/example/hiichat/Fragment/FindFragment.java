@@ -213,7 +213,7 @@ public class FindFragment extends Fragment {
                 for (int i = 0; i < arr.size() ; i ++) {
                    if( arr.get(i).getGioiTinh().equals(gender)
                            &&(  Integer.parseInt(arr.get(i).getTuoi()) > Integer.parseInt(tvtOldBegin.getText().toString())
-                           &&  Integer.parseInt(arr.get(i).getTuoi()) < Integer.parseInt(tvtOldEnd.getText().toString()))
+                           &&  Integer.parseInt(arr.get(i).getTuoi()) <= Integer.parseInt(tvtOldEnd.getText().toString()))
                            && ((CalculationByDistance(latUser, arr.get(i).latitude, lngUser, arr.get(i).longitude) < Double.parseDouble(tvtPossitionEnd.getText().toString()))))
                    {
                        arrFind.add(arr.get(i));
