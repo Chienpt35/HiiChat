@@ -58,11 +58,11 @@ public final class FriendDB {
             Cursor cursor = db.rawQuery("select * from " + FeedEntry.TABLE_NAME, null);
             while (cursor.moveToNext()) {
                 Friend friend = new Friend();
-                friend.id = cursor.getString(0);
-                friend.name = cursor.getString(1);
-                friend.email = cursor.getString(2);
-                friend.idRoom = cursor.getString(3);
-                friend.avata = cursor.getString(4);
+                friend.id = cursor.getString(1);
+                friend.name = cursor.getString(2);
+                friend.email = cursor.getString(3);
+                friend.idRoom = cursor.getString(4);
+                friend.avata = cursor.getString(5);
                 listFriend.getListFriend().add(friend);
             }
             cursor.close();
@@ -81,6 +81,7 @@ public final class FriendDB {
     /* Inner class that defines the table contents */
     public static class FeedEntry implements BaseColumns {
         static final String TABLE_NAME = "friend";
+        static final String COLUMN_ID = "ID";
         static final String COLUMN_NAME_ID = "friendID";
         static final String COLUMN_NAME_NAME = "name";
         static final String COLUMN_NAME_EMAIL = "email";
@@ -92,7 +93,8 @@ public final class FriendDB {
     private static final String COMMA_SEP = ",";
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + FeedEntry.TABLE_NAME + " (" +
-                    FeedEntry.COLUMN_NAME_ID + " TEXT PRIMARY KEY," +
+                    FeedEntry.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    FeedEntry.COLUMN_NAME_ID + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_NAME_NAME + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_NAME_EMAIL + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_NAME_ID_ROOM + TEXT_TYPE + COMMA_SEP +

@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -302,11 +303,7 @@ public class UserProfileFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     if(config.getLabel().equals(SIGNOUT_LABEL)){
-                        FirebaseAuth.getInstance().signOut();
-                        FriendDB.getInstance(getContext()).dropDB();
-                        GroupDB.getInstance(getContext()).dropDB();
-                        ServiceUtils.stopServiceFriendChat(getContext().getApplicationContext(), true);
-                        getActivity().finish();
+                        showAlertDialog().show();
                     }
 
                     if(config.getLabel().equals(USERNAME_LABEL)){
@@ -356,6 +353,41 @@ public class UserProfileFragment extends Fragment {
                     }
                 }
             });
+        }
+
+        private void logOut() {
+            FirebaseAuth.getInstance().signOut();
+            FriendDB.getInstance(getContext()).dropDB();
+            GroupDB.getInstance(getContext()).dropDB();
+            ServiceUtils.stopServiceFriendChat(getContext().getApplicationContext(), true);
+            getActivity().finish();
+        }
+
+        public AlertDialog showAlertDialog() {
+            View alertLayout = LayoutInflater.from(context).inflate(R.layout.alert_dialog, null);
+            AlertDialog.Builder alert = new AlertDialog.Builder(context);
+
+            TextView tvTittle;
+            Button btnOk;
+            Button btnCancel;
+
+            tvTittle = (TextView) alertLayout.findViewById(R.id.tv_tittle);
+            btnOk = (Button) alertLayout.findViewById(R.id.btn_ok);
+            btnCancel = (Button) alertLayout.findViewById(R.id.btn_cancel);
+
+            tvTittle.setText("Bạn có chắc chắn muốn đăng xuất ?");
+
+            alert.setView(alertLayout);
+            alert.setCancelable(false);
+            AlertDialog dialog = alert.create();
+            btnOk.setOnClickListener(v -> {
+                logOut();
+                dialog.dismiss();
+            });
+            btnCancel.setOnClickListener(view -> {
+                dialog.dismiss();
+            });
+            return dialog;
         }
 
         /**
