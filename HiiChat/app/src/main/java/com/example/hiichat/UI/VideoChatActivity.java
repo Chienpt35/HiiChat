@@ -38,8 +38,8 @@ public class VideoChatActivity extends AppCompatActivity implements Session.Sess
     private FrameLayout publisherContainer;
     private ImageView imgCancelCall;
     private static String API_KEY = "46883964";
-    private static String SESSION_ID = "1_MX40Njg4Mzk2NH5-MTU5NzQ5NjY1MjI4N35Db0VoUHplK2h0dnprS2w1ZnNzQ2RTcVJ-fg";
-    private static String TOKEN = "T1==cGFydG5lcl9pZD00Njg4Mzk2NCZzaWc9MWI3MTJhYWYxYzYyMGZlODRlM2QwYWVlM2JlMWU3YmRhODIyZGY5ZjpzZXNzaW9uX2lkPTFfTVg0ME5qZzRNemsyTkg1LU1UVTVOelE1TmpZMU1qSTROMzVEYjBWb1VIcGxLMmgwZG5wclMydzFabk56UTJSVGNWSi1mZyZjcmVhdGVfdGltZT0xNTk3NDk2NzE3Jm5vbmNlPTAuNTQxMzg5NDgyMTg3NDA3JnJvbGU9cHVibGlzaGVyJmV4cGlyZV90aW1lPTE2MDAwODg3MTYmaW5pdGlhbF9sYXlvdXRfY2xhc3NfbGlzdD0=";
+    private static String SESSION_ID = "2_MX40Njg4Mzk2NH5-MTYwMDcwNzM2ODIzM35Za05pVnAyam1hSDdVQTdnTlhSeks4Q3F-fg";
+    private static String TOKEN = "T1==cGFydG5lcl9pZD00Njg4Mzk2NCZzaWc9YmY4Y2E2MmM2NDY4OWNkNTY5NTQ0MGIxNDE2NmJjZjlmODE2NTViYTpzZXNzaW9uX2lkPTJfTVg0ME5qZzRNemsyTkg1LU1UWXdNRGN3TnpNMk9ESXpNMzVaYTA1cFZuQXlhbTFoU0RkVlFUZG5UbGhTZWtzNFEzRi1mZyZjcmVhdGVfdGltZT0xNjAwNzA3NDA0Jm5vbmNlPTAuMDUzMTA1NzYzMzc3NzgwNSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNjAzMjk5NDAzJmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9";
     private static final String LOG_TAG = VideoChatActivity.class.getSimpleName();
     private static final int RC_VIDEO_APP_PERM = 123;
     private DatabaseReference usersRef;

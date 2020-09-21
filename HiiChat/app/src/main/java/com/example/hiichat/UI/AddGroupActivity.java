@@ -40,7 +40,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class AddGroupActivity extends AppCompatActivity {
-
     private RecyclerView recyclerListFriend;
     private ListPeopleAdapter adapter;
     private ListFriend listFriend;
