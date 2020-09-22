@@ -25,7 +25,7 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class CallingActivity extends AppCompatActivity {
+public class CallingActivity extends AppCompatActivity{
     private CircleImageView imgAvatar;
     private ImageView imgMakeCall;
     private ImageView imgCancelCall;
@@ -204,7 +204,6 @@ public class CallingActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
         mediaPlayerWaiting.start();
 
         usersRef.addValueEventListener(new ValueEventListener() {
@@ -235,4 +234,5 @@ public class CallingActivity extends AppCompatActivity {
             }
         });
     }
+
 }

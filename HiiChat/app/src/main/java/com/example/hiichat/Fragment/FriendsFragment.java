@@ -545,7 +545,6 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         ((View) ((ItemFriendViewHolder) holder).txtName.getParent().getParent().getParent())
                 .setOnLongClickListener(view -> {
                     String friendName = (String) ((ItemFriendViewHolder) holder).txtName.getText();
-
                     new AlertDialog.Builder(context)
                             .setTitle("Delete Friend")
                             .setMessage("Are you sure want to delete " + friendName + "?")
@@ -557,6 +556,11 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                         .setTopColorRes(R.color.colorAccent)
                                         .show();
                                 deleteFriend(idFriendRemoval);
+                                FirebaseDatabase.getInstance().getReference().child("Request Friend").child(StaticConfig.UID).child(idFriendRemoval).removeValue();
+                                FirebaseDatabase.getInstance().getReference().child("Request Friend").child(idFriendRemoval).child(StaticConfig.UID).removeValue();
+
+                                FirebaseDatabase.getInstance().getReference().child("friend").child(StaticConfig.UID).removeValue();
+                                FirebaseDatabase.getInstance().getReference().child("friend").child(idFriendRemoval).removeValue();
                             })
                             .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss()).show();
 
